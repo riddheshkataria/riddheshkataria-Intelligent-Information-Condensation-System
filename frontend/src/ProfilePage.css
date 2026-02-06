@@ -1,0 +1,568 @@
+/* --- Global Styles & Variables (Re-used from DatabasePage.css) --- */
+:root {
+    --primary-color: #14b8a6;
+    --primary-color-dark: #0d9488;
+    --primary-color-light: #e0f2f2;
+    --background-color: #F0F2F5;
+    --container-bg-color: #FFFFFF;
+    --text-dark: #333333;
+    --text-light: #6c757d;
+    --border-color: #E0E0E0;
+    --table-stripe-color: #F9F9F9;
+    --font-family: 'Arial', sans-serif;
+    --header-search-bg: #F8F8FA;
+    --footer-bg-gradient-start: #00BFBF;
+    --footer-bg-gradient-end: #007C7C;
+    --footer-text-color: #FFFFFF;
+    --star-color: #ffc107;
+    --green-check: #28a745; /* For access tags */
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-dark);
+}
+
+.profile-page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    position: relative; /* Needed for sidebar and overlay positioning */
+}
+
+/* --- Overlay for Sidebar --- */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99; /* Ensure it's above content but below sidebar */
+}
+
+/* --- Header (Copied from DatabasePage.css) --- */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--container-bg-color);
+    border-bottom: 1px solid var(--border-color);
+    gap: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    position: relative; /* Needed for its z-index over main-content */
+    z-index: 1; /* Ensure header is above main content */
+}
+.logo {
+    height: 40px;
+    width: auto;
+    flex-shrink: 0;
+    margin-right: 1rem;
+}
+.header-middle {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+}
+.search-bar-header {
+    display: flex;
+    align-items: center;
+    background-color: var(--header-search-bg);
+    border-radius: 25px;
+    padding: 0.75rem 1.5rem;
+    width: 100%;
+    max-width: 600px;
+}
+.search-bar-header input {
+    border: none;
+    background: transparent;
+    outline: none;
+    margin-left: 0.75rem;
+    font-size: 1rem;
+    color: var(--text-dark);
+    width: 100%;
+}
+.search-bar-header svg {
+    stroke: var(--text-light);
+}
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+}
+.lang-btn-header {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s;
+}
+.lang-btn-header:hover {
+    background-color: var(--primary-color-dark);
+}
+.lang-btn-header svg {
+    color: white;
+    width: 24px;
+    height: 24px;
+}
+.user-profile {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.user-profile:hover {
+    background-color: var(--primary-color-dark);
+}
+.user-profile svg {
+    stroke: white;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    background-color: var(--container-bg-color);
+    z-index: 100; /* Ensure sidebar is above overlay */
+    padding: 1rem;
+    padding-top: 6rem; /* Space for a potential header/logo inside sidebar */
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+}
+.sidebar.open {
+    transform: translateX(0);
+}
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.sidebar nav li {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: var(--container-bg-color);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease-in-out;
+}
+.sidebar nav li.active { /* Example for an active state */
+    background-color: var(--primary-color-light);
+    border-color: var(--primary-color);
+    color: var(--primary-color-dark);
+    font-weight: bold;
+}
+.sidebar nav li.active svg {
+    stroke: var(--primary-color);
+}
+.sidebar nav li:hover {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+.sidebar nav li:hover svg {
+    stroke: white;
+}
+.sidebar nav li:not(.active) svg {
+    stroke: var(--text-dark);
+}
+
+
+/* --- Profile Main Content --- */
+.profile-main-content {
+    flex-grow: 1;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background-color: var(--background-color);
+    position: relative; /* Needed for hamburger button positioning */
+}
+
+/* --- Hamburger button on Profile Page --- */
+.hamburger-btn-profile {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    background: var(--container-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+    z-index: 10; /* Ensure it's above other content but below overlay/sidebar */
+}
+.hamburger-btn-profile:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: var(--primary-color-light);
+}
+.hamburger-btn-profile svg {
+    stroke: var(--text-dark);
+}
+
+.profile-card {
+    background-color: var(--container-bg-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 900px;
+    margin: 2rem 0;
+    position: relative; /* Needed if any child elements are absolutely positioned relative to card */
+    z-index: 5; /* Ensure card is above some background elements */
+}
+
+/* --- Profile Header Section --- */
+.profile-header-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    position: relative;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--primary-color-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 2px solid var(--primary-color);
+}
+
+.profile-avatar svg {
+    width: 50px;
+    height: 50px;
+    stroke: var(--primary-color-dark);
+}
+
+.profile-info-basic {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-grow: 1;
+}
+
+.profile-name {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.profile-role {
+    margin: 0.25rem 0 0.5rem 0;
+    font-size: 1rem;
+    color: var(--text-light);
+}
+
+.profile-id {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    background-color: var(--header-search-bg);
+    padding: 0.3rem 0.8rem;
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+.edit-profile-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+    transition: color 0.2s;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.edit-profile-btn:hover {
+    color: var(--primary-color);
+}
+.edit-profile-btn svg {
+    stroke: currentColor;
+}
+
+
+/* --- Profile Sections (Personal Info, Data & Privacy, Access) --- */
+.profile-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.profile-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+.info-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1.2rem;
+    background-color: var(--header-search-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.info-item .info-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    flex-basis: 150px;
+    flex-shrink: 0;
+}
+
+.info-item .info-value {
+    flex-grow: 1;
+    color: var(--text-light);
+    font-size: 0.95rem;
+}
+
+.info-item svg {
+    flex-shrink: 0;
+    margin-left: 1rem;
+    stroke: var(--text-light);
+}
+
+.info-item .info-value {
+    margin-right: auto;
+}
+
+.info-item .info-value + svg { /* Icon next to info-value */
+    stroke: var(--primary-color);
+}
+
+
+/* --- Access Tags --- */
+.access-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.access-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 25px;
+    background-color: var(--primary-color-light);
+    color: var(--primary-color-dark);
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1px solid var(--primary-color);
+}
+
+.access-tag svg {
+    stroke: var(--green-check);
+    width: 16px;
+    height: 16px;
+}
+
+.access-tag.owner {
+    background-color: #fce8cc;
+    color: #e09f2d;
+    border-color: #e09f2d;
+}
+.access-tag.owner svg {
+    stroke: #e09f2d;
+}
+
+
+/* --- Footer (Copied from DatabasePage.css) --- */
+.page-footer {
+    background: linear-gradient(to right, var(--footer-bg-gradient-start), var(--footer-bg-gradient-end));
+    color: var(--footer-text-color);
+    padding: 2rem 4rem;
+    margin-top: auto;
+}
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.footer-logo-section {
+    flex-basis: 150px;
+    flex-shrink: 0;
+    padding-top: 0.5rem;
+}
+.footer-logo {
+    height: 60px;
+    filter: brightness(0) invert(1);
+}
+.footer-section {
+    flex: 1;
+    min-width: 250px;
+}
+.footer-section h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+.footer-section p {
+    margin: 0.75rem 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    line-height: 1.4;
+}
+.footer-section p svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.footer-social {
+    min-width: 180px;
+}
+.social-icons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.social-icons svg {
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s;
+}
+.social-icons svg:hover {
+    transform: translateY(-3px);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 1024px) {
+    .profile-card {
+        padding: 2rem;
+        max-width: 700px;
+    }
+    .profile-header-section {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .profile-info-basic {
+        align-items: center;
+    }
+    .edit-profile-btn {
+        position: static;
+        margin-top: 1rem;
+    }
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .info-item .info-label {
+        flex-basis: auto;
+        margin-bottom: 0.5rem;
+    }
+    .info-item svg {
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 1rem;
+    }
+    .header-middle {
+        order: 3;
+        flex-basis: 100%;
+        margin-top: 1rem;
+    }
+    .header-controls {
+        order: 2;
+    }
+    .profile-main-content {
+        padding: 1rem;
+    }
+    .hamburger-btn-profile { /* Adjust position for smaller screens */
+        top: 1rem;
+        left: 1rem;
+    }
+    .profile-card {
+        padding: 1.5rem;
+        margin: 1rem 0;
+    }
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .footer-section {
+        min-width: unset;
+        width: 100%;
+    }
+    .footer-section p {
+        justify-content: center;
+    }
+    .social-icons {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-card {
+        padding: 1rem;
+    }
+    .profile-name {
+        font-size: 1.5rem;
+    }
+}

@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+transformers
+torch
+numpy
+python-dotenv
+pymupdf
+pillow
+pytesseract
+requests
+python-multipart
+protobuf
+sentencepiece

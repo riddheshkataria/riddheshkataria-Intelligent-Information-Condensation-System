@@ -1,0 +1,457 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.landing-container {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: white;
+  min-height: 100vh;
+}
+
+
+/* Header - Transparent and positioned over hero image */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 6rem; /* Increased from 2rem to 6rem for wider header */
+  background: transparent;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  box-shadow: none;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.header-logo {
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Hide company name as shown in your image */
+.company-name {
+  display: none;
+}
+
+.login-button {
+  background: #2dd4bf;
+  color: white;
+  text-decoration: none;
+  padding: 0.7rem 1.4rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.login-button:hover {
+  background: #0891b2;
+  transform: translateY(-1px);
+  text-decoration: none;
+  color: white;
+}
+
+/* Hero Section - Full width behind header */
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  margin-top: 0;
+  margin-bottom: 0; /* No gap between hero and welcome */
+}
+
+
+.hero-image-container {
+  width: 100%;
+  height: 100%;
+}
+
+.hero-train-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Welcome Section - Full width teal background BELOW hero */
+.welcome-card {
+  position: relative;
+  width: 100%;
+  background: #7dd3c0;
+  padding: 3rem 4rem;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  z-index: 1;
+}
+
+.welcome-card h1 {
+  color: #000;
+  font-size: 2.75rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.welcome-card p {
+  color: #000;
+  font-size: 1.25rem;
+  line-height: 1.6;
+  text-align: left;
+  max-width: 900px;
+  font-weight: 400;
+  margin: 0;
+}
+
+
+/* Vision Section */
+.vision-section {
+  padding: 5rem 2rem 3rem;
+  background: transparent;
+}
+
+.content-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.vision-card {
+  flex: 1;
+  background: #2dd4bf;
+  color: white;
+  padding: 5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(45, 212, 191, 0.3);
+}
+
+.vision-card h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.vision-card p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.connecting-dots {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.dot {
+  border-radius: 50%;
+  background: #2dd4bf;
+}
+
+.dot.large {
+  width: 16px;
+  height: 16px;
+}
+
+.dot.medium {
+  width: 12px;
+  height: 12px;
+  opacity: 0.7;
+}
+
+.dot.small {
+  width: 8px;
+  height: 8px;
+  opacity: 0.5;
+}
+
+.vision-image {
+  flex: 0 0 300px;
+  height: 300px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.vision-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Mission Section */
+.mission-section {
+  padding: 3rem 2rem;
+  background: transparent;
+}
+
+.mission-image {
+  flex: 0 0 300px;
+  height: 300px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.mission-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mission-card {
+  flex: 1;
+  background: #2dd4bf;
+  color: white;
+  padding: 5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(45, 212, 191, 0.3);
+}
+
+.mission-card h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.mission-card p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Values Section */
+.values-section {
+  background: #2dd4bf;
+  padding: 3rem 2rem;
+}
+
+.values-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  color: white;
+}
+
+.values-container h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.values-content p {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.values-content strong {
+  font-weight: 600;
+}
+
+/* Footer */
+.footer {
+  background: linear-gradient(135deg, #0f766e, #14b8a6);
+  color: white;
+  padding: 2.5rem 2rem;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 3rem;
+  align-items: start;
+}
+
+.footer-logo img {
+  width: 125px;
+  height: 125px;
+  background: white;
+  border-radius: 8px;
+  padding: 6px;
+  object-fit: contain;
+}
+
+.contact-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.contact-section h4, .address-section h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  color: #a7f3d0;
+}
+
+.contact-section p, .address-section p {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 0.3rem;
+}
+
+.social-media h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  color: #a7f3d0;
+}
+
+.social-icons {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.social-icons span {
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.social-icons span:hover {
+  transform: scale(1.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header {
+    padding: 0.8rem 1rem;
+  }
+  
+  .company-name {
+    display: none; /* Keep hidden as per your design */
+  }
+  
+  .header-logo {
+    width: 60px; /* Adjusted for mobile */
+    height: auto;
+  }
+  
+  .login-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+  
+  .hero-section {
+    height: 280px; /* Smaller hero on mobile */
+  }
+  
+  .welcome-card {
+    padding: 2rem 1.5rem; /* Adjust padding for mobile */
+    width: 100%;
+    margin: 0;
+    position: relative;
+    background: #7dd3c0;
+  }
+  
+  .welcome-card h1 {
+    font-size: 2rem; /* Smaller heading on mobile */
+  }
+  
+  .welcome-card p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  
+  .content-container {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .vision-image, .mission-image {
+    flex: 0 0 220px;
+    height: 220px;
+  }
+  
+  .footer-container {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 2rem;
+  }
+  
+  .contact-details {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-logo {
+    width: 50px; /* Even smaller on very small screens */
+    height: auto;
+  }
+  
+  .login-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+  
+  .hero-section {
+    height: 220px; /* Very compact hero */
+  }
+  
+  .welcome-card {
+    padding: 1.5rem 1rem; /* Tighter padding */
+  }
+  
+  .welcome-card h1 {
+    font-size: 1.6rem; /* Smaller heading */
+    margin-bottom: 1rem;
+  }
+  
+  .welcome-card p {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  
+  .vision-card, .mission-card {
+    padding: 1.5rem;
+  }
+  
+  .vision-card h2, .mission-card h2 {
+    font-size: 1.4rem;
+  }
+  
+  .vision-image, .mission-image {
+    flex: 0 0 180px;
+    height: 180px;
+  }
+  
+  .values-section {
+    padding: 2rem 1rem;
+  }
+  
+  .footer {
+    padding: 2rem 1rem;
+  }
+}
+
+.social-icons a {
+    color: #FFFFFF; /* Default icon color */
+    transition: color 0.2s ease-in-out;
+}
+
+.social-icons a:hover {
+    color: #9CA3AF; /* Icon color on hover */
+}
+
+.social-icons svg {
+    width: 24px;
+    height: 24px;
+}

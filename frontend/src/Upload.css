@@ -1,0 +1,209 @@
+/* Background overlay */
+.upload-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(171, 210, 207, 0.4); /* light teal transparent overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* Main popup container */
+.upload-popup {
+  background-color: #b5e3e0; /* light teal */
+  padding: 24px 32px 32px;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+  width: 500px;
+  max-width: 90vw;
+  position: relative;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Close button top right */
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: none;
+  background: transparent;
+  font-size: 24px;
+  cursor: pointer;
+  color: #004d40;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* Title */
+.upload-title {
+  margin: 0 0 24px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #004d40;
+}
+
+/* Drag and drop area */
+.upload-dropzone {
+  position: relative;
+  background-color: #ffffff;
+  border: 1px solid #3dc4bf;
+  border-radius: 10px;
+  padding: 32px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+  margin-bottom: 24px;
+}
+
+.upload-dropzone.drag-over {
+  border-color: #00695c;
+  background-color: #e0f2f1;
+}
+
+.upload-icon {
+  font-size: 36px;
+  color: #3dc4bf;
+  margin-bottom: 12px;
+}
+
+.upload-text {
+  font-size: 14px;
+  color: #004d40;
+  margin-bottom: 16px;
+}
+
+/* Hidden file input expanded to full div area for clicking */
+.file-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Browse button */
+.browse-btn {
+  padding: 7px 24px;
+  border-radius: 25px;
+  border: 1px solid #3dc4bf;
+  background-color: #e0f2f1;
+  color: #004d40;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.browse-btn:hover {
+  background-color: #a5d4d1;
+}
+
+/* File list */
+.file-list {
+  margin-top: 12px;
+  text-align: left;
+  max-height: 100px;
+  overflow-y: auto;
+  border-top: 1px solid #3dc4bf;
+  padding-top: 6px;
+}
+
+.file-item {
+  font-size: 14px;
+  color: #004d40;
+  padding: 2px 0;
+}
+
+/* Upload Sources */
+.upload-sources {
+  margin-bottom: 24px;
+  color: #004d40;
+}
+
+.upload-sources h3 {
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.sources-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.source-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #3dc4bf;
+  background-color: #ecf6f5;
+  color: #004d40;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  user-select: none;
+}
+
+.source-btn.selected {
+  background-color: #004d40;
+  color: #b5e3e0;
+  border-color: #004d40;
+}
+
+/* Extra inputs: paste text & cloud link */
+.extra-inputs {
+  margin-bottom: 24px;
+  color: #004d40;
+}
+
+.extra-inputs label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.extra-inputs textarea,
+.extra-inputs input[type='text'] {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #3dc4bf;
+  border-radius: 6px;
+  font-size: 14px;
+  outline-color: #3dc4bf;
+  resize: vertical;
+  background-color: #ffffff;
+  color: #004d40;
+  margin-bottom: 12px;
+}
+
+/* Upload button */
+.upload-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 16px;
+  font-weight: 700;
+  background-color: #004d40;
+  color: #b5e3e0;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  user-select: none;
+}
+
+.upload-btn:disabled {
+  background-color: #80cbc4;
+  cursor: not-allowed;
+}
+
+.upload-btn:not(:disabled):hover {
+  background-color: #00796b;
+}
