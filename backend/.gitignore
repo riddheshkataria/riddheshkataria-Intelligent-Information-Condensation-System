@@ -15,4 +15,4 @@ yarn-error.log*
 # Build output
 # If you have a build step that transpiles code (e.g., TypeScript to JS).
 /dist
-/build
+/buildbackend/uploads
