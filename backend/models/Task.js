@@ -9,33 +9,37 @@ const taskSchema = new mongoose.Schema(
     description: {
       type: String,
     },
-    // This is the crucial field that links the task to a specific user.
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: 'User', // Creates a direct reference to a document in the 'User' collection
+      ref: 'User',
     },
-    // This links the task back to the source document that created it.
     relatedDocument: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: 'Document', // Creates a direct reference to a document in the 'Document' collection
+      ref: 'Document',
+      default: null,
     },
     status: {
       type: String,
       enum: ['pending', 'in-progress', 'completed'],
       default: 'pending',
     },
+    deadline: {
+      type: String,
+    },
+    urgency: {
+      type: String,
+      enum: ['Low', 'Medium', 'High'],
+      default: 'Low',
+    },
     dueDate: {
       type: Date,
     },
   },
   {
-    // This automatically adds `createdAt` and `updatedAt` fields
     timestamps: true,
   }
 );
 
 const Task = mongoose.model('Task', taskSchema);
 export default Task;
-
