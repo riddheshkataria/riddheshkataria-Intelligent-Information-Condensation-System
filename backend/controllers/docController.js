@@ -2,7 +2,7 @@ import Document from '../models/Document.js';
 import fs from 'fs/promises'; // Use the modern, promise-based version of fs
 import path from 'path';     // Import the path module
 import { extractText } from '../utils/textExtractor.js';
-import fetch from 'node-fetch';
+import { processDocumentWithGemini } from '../services/geminiService.js';
 import Task from '../models/Task.js';
 import User from '../models/User.js';
 
@@ -47,40 +47,17 @@ export const uploadDoc = async (req, res) => {
 // --- Background Processing (LIVE NLP INTEGRATION) ---
 const processDocument = async (docId, filePath) => {
   try {
-    // Step A: Read the entire file into a buffer
-    const fileBuffer = await fs.readFile(filePath);
+    // Call our new Gemini service directly with the file path
+    const mlResult = await processDocumentWithGemini(filePath, 'application/pdf');
 
-    // Step B: Create a "Blob", which is the standard way to handle file data
-    const fileBlob = new Blob([fileBuffer], { type: 'application/pdf' });
-
-    // Step C: Use the NATIVE FormData object to package the file
-    const formData = new FormData();
-    // The third argument is the filename, which the NLP service needs
-    formData.append('file', fileBlob, path.basename(filePath));
-
-    // Step D: Call the live NLP service endpoint
-    // node-fetch automatically handles the headers for the native FormData object
-    const mlResponse = await fetch(process.env.ML_SERVICE_URL, {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!mlResponse.ok) {
-      // If the ML service returns an error, we capture it
-      const errorBody = await mlResponse.text();
-      throw new Error(`NLP service failed with status ${mlResponse.status}: ${errorBody}`);
-    }
-
-    const mlResult = await mlResponse.json();
-    
     // Step C: Destructure the rich data from the REAL response
-    const { 
-      summary, 
-      entities, 
+    const {
+      summary,
+      entities,
       categories, // We'll use this as our documentType
-      tags, 
-      important_dates, 
-      names 
+      tags,
+      important_dates,
+      names
     } = mlResult;
 
     // Step D: Update the document in the DB with all the new, real data
@@ -193,13 +170,13 @@ export const shareDocument = async (req, res) => {
     if (!userToShareWith) {
       return res.status(404).json({ message: `User with email ${email} not found` });
     }
-    
+
     // 4. Prevent sharing with the owner or if already shared
     if (document.user.toString() === userToShareWith._id.toString()) {
-        return res.status(400).json({ message: 'Cannot share document with the owner.' });
+      return res.status(400).json({ message: 'Cannot share document with the owner.' });
     }
     if (document.sharedWith.includes(userToShareWith._id)) {
-        return res.status(400).json({ message: 'Document already shared with this user.' });
+      return res.status(400).json({ message: 'Document already shared with this user.' });
     }
 
     // 5. Add the user to the sharedWith array and save
