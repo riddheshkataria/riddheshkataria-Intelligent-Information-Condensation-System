@@ -1,22 +1,20 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './App.css';
+import './LoginPage.css';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
 
-  // This function now handles the API call and redirects on success
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(''); // Clear previous errors
+    setError('');
 
     try {
-      // Send the login request to your backend API
       const response = await fetch('http://localhost:5000/api/users/login', {
         method: 'POST',
         headers: {
@@ -27,97 +25,95 @@ function LoginPage() {
 
       const data = await response.json();
 
-      // Check if the login was successful
       if (!response.ok) {
         throw new Error(data.message || 'Login failed. Please check your credentials.');
       }
 
-      // Handle a successful login
-      console.log('Login successful:', data);
-      localStorage.setItem('userToken', data.token); // Store the token
-      
-      // Redirect to the dashboard
-      navigate('/dashboard'); 
-
+      localStorage.setItem('userToken', data.token);
+      navigate('/dashboard');
     } catch (err) {
-      // Handle failed login attempts
-      console.error('Login error:', err.message);
-      setError(err.message); // Display the error message to the user
+      setError(err.message);
     } finally {
-      setLoading(false); // Stop the loading indicator
+      setLoading(false);
     }
   };
 
   return (
-    <div className="app">
-      {/* Header */}
-      <header className="header">
-        {/* <div className="logo-section">
-          <img src="/logo.png" alt="IICS Logo" className="header-logo" />
-          <span className="header-text"><h1>IICS</h1></span>
-        </div> */}
-        <Link to="/" className="login-button">Home</Link>
+    <div className="login-page">
+      <div className="login-bg login-bg-top" />
+      <div className="login-bg login-bg-bottom" />
+
+      <header className="login-page-header">
+        <Link to="/" className="login-brand">
+          <span className="brand-pulse" />
+          IICS
+        </Link>
+        <Link to="/" className="login-home-link">Back to Home</Link>
       </header>
 
-      {/* Main Content */}
-      <main className="main-content">
-        {/* Background Elements */}
-        <div className="background-elements">
-          <div className="geometric-shape circle-1"></div>
-          <div className="geometric-shape circle-2"></div>
-          <div className="geometric-shape triangle-1"></div>
-          <div className="mountains"></div>
-          <div className="bridge"></div>
-          {/* <div className="metro-train">
-            <div className="train-body"></div>
-            <div className="train-front"></div>
-            <div className="train-windows"></div>
-          </div> */}
-          <div className="buildings">
-            <div className="building building-1"></div>
-            <div className="building building-2"></div>
-            <div className="building building-3"></div>
+      <main className="login-page-main">
+        <section className="login-intro-card">
+          <p className="intro-eyebrow">Secure Workspace Access</p>
+          <h1>Welcome to your intelligence command center.</h1>
+          <p>
+            Sign in to manage condensed insights, track document intelligence, and keep every decision linked to
+            reliable evidence.
+          </p>
+
+          <div className="intro-points">
+            <article>
+              <h3>Faster context</h3>
+              <p>Bring scattered updates into one digestible, searchable view.</p>
+            </article>
+            <article>
+              <h3>Trusted outputs</h3>
+              <p>Trace conclusions directly to source material and confidence signals.</p>
+            </article>
+            <article>
+              <h3>Role-aware control</h3>
+              <p>Protect sensitive workflows with access boundaries and audit trails.</p>
+            </article>
           </div>
-        </div>
+        </section>
 
-        {/* Login Form */}
-        <div className="login-container">
-          <div className="login-form">
+        <section className="login-form-shell">
+          <div className="login-form-card">
+            <p className="form-eyebrow">Account Login</p>
+            <h2 className="login-title">Welcome back</h2>
+            <p className="login-subtitle">Enter your credentials to continue.</p>
 
-            <h2 className="login-title">Login</h2>
-
-            <form onSubmit={handleLogin}>
-              <div className="form-group">
-                <label htmlFor="email">Email</label>
+            <form className="login-form" onSubmit={handleLogin}>
+              <label className="login-field" htmlFor="email">
+                Email
                 <input
                   type="email"
                   id="email"
-                  placeholder="Enter Email"
+                  placeholder="you@company.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
-              </div>
+              </label>
 
-              <div className="form-group">
-                <label htmlFor="password">Password</label>
+              <label className="login-field" htmlFor="password">
+                Password
                 <input
                   type="password"
                   id="password"
-                  placeholder="Enter Password"
+                  placeholder="Enter password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required  
+                  required
                 />
-              </div>
+              </label>
 
-              {error && <p className="error-message">{error}</p>}
+              {error && <p className="error-message" role="alert">{error}</p>}
               <button type="submit" className="login-btn" disabled={loading}>
-                {loading ? 'Logging in...' : 'Login'}
+                {loading ? 'Signing in...' : 'Sign In'}
               </button>
             </form>
           </div>
-        </div>
+        </section>
       </main>
     </div>
   );
