@@ -14,8 +14,8 @@ const PhoneIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" heigh
 // --- Header Component ---
 const PageHeader = () => (
     <header className="page-header">
-        <div className="logo-section"><img src="/logo.png" alt="KMRL Logo" className="header-logo" /><span className="header-title">KMRL SAARAM</span></div>
-        <div className="header-controls"><button className="language-toggle">English <span>Aあ</span></button><button className="profile-button" aria-label="Profile"><ProfileIcon /></button></div>
+        <div className="logo-section"><img src="/logo.png" alt="IICS Logo" className="header-logo" /><span className="header-title">IICS</span></div>
+        <div className="header-controls"><button className="profile-button" aria-label="Profile"><ProfileIcon /></button></div>
     </header>
 );
 

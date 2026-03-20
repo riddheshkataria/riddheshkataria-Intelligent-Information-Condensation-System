@@ -53,7 +53,7 @@ function LoginPage() {
       {/* Header */}
       <header className="header">
         {/* <div className="logo-section">
-          <img src="/logo.png" alt="Kochi Metro Logo" className="header-logo" />
+          <img src="/logo.png" alt="IICS Logo" className="header-logo" />
           <span className="header-text"><h1>IICS</h1></span>
         </div> */}
         <Link to="/" className="login-button">Home</Link>
@@ -68,11 +68,11 @@ function LoginPage() {
           <div className="geometric-shape triangle-1"></div>
           <div className="mountains"></div>
           <div className="bridge"></div>
-          <div className="metro-train">
+          {/* <div className="metro-train">
             <div className="train-body"></div>
             <div className="train-front"></div>
             <div className="train-windows"></div>
-          </div>
+          </div> */}
           <div className="buildings">
             <div className="building building-1"></div>
             <div className="building building-2"></div>

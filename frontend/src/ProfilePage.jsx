@@ -7,7 +7,7 @@ import './ProfilePage.css'; // New CSS for this page
 const SearchIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>;
 const UserIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>;
 const HamburgerIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>;
-const TranslateIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 32 32"> <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="16" fontWeight="bold" fill="currentColor"> Aあ </text> </svg> );
+
 const PhoneIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-3.1-3.1A19.79 19.79 0 0 1 2 4.18 2 2 0 0 1 4.18 2h3a2 2 0 0 1 2 1.72c.1.72.32 1.44.64 2.15a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.71.32 1.43.54 2.15.64a2 2 0 0 1 1.72 2z"></path></svg>;
 const MailIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>;
 const MapPinIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>;
@@ -25,9 +25,9 @@ const CheckCircleIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18"
 const ShieldIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>;
 
 // --- Header Component (from Database.js) ---
-const Header = ({ currentLang, toggleLanguage }) => (
+const Header = () => (
     <header className="page-header">
-        <img src="/logo.png" alt="KMRL SAARAM Logo" className="logo" />
+        <img src="/logo.png" alt="IICS Logo" className="logo" />
         <div className="header-middle">
             <div className="search-bar-header">
                 <SearchIcon />
@@ -35,10 +35,6 @@ const Header = ({ currentLang, toggleLanguage }) => (
             </div>
         </div>
         <div className="header-controls">
-            <button className="lang-btn-header" onClick={toggleLanguage}>
-                <span>{currentLang === 'english' ? 'English' : 'മലയാളം'}</span>
-                <TranslateIcon />
-            </button>
             <div className="user-profile">
                 <UserIcon />
             </div>
@@ -51,16 +47,16 @@ const Footer = () => (
     <footer className="page-footer">
         <div className="footer-content">
             <div className="footer-logo-section">
-                <img src="/logo.png" alt="KMRL SAARAM Logo" className="footer-logo" />
+                <img src="/logo.png" alt="IICS Logo" className="footer-logo" />
             </div>
             <div className="footer-section">
                 <h4>Contact Us</h4>
                 <p><PhoneIcon />+91 98765 43210 / +91 99887 76655</p>
-                <p><MailIcon />hr@kmrl.com</p>
+                <p><MailIcon />hr@iics.com</p>
             </div>
             <div className="footer-section">
                 <h4>Address</h4>
-                <p><MapPinIcon />Kochi Metro Rail Ltd. (KMRL), 4th Floor, Revenue Tower, Park Avenue, Kochi - 682011, Kerala, India.</p>
+                <p><MapPinIcon />IICS Headquarters, Innovation Hub, Cyber City - 682011</p>
             </div>
             <div className="footer-social">
                 <h4>Follow Us</h4>
@@ -93,10 +89,8 @@ const Sidebar = ({ isOpen }) => (
 
 
 const ProfilePage = () => {
-    const [currentLanguage, setCurrentLanguage] = useState('english');
     const [isSidebarOpen, setSidebarOpen] = useState(false); // State for sidebar
 
-    const toggleLanguage = () => setCurrentLanguage(prev => prev === 'english' ? 'malayalam' : 'english');
     const toggleSidebar = () => setSidebarOpen(!isSidebarOpen); // Function to toggle sidebar
 
     // --- Employee Data ---
@@ -105,9 +99,9 @@ const ProfilePage = () => {
         role: "Station Operations Manager",
         id: "101234030482",
         birthDate: "15/05/1988",
-        address: "Apartment 1201, Metro View Towers, MG Road, Kochi - 682016, Kerala, India",
+        address: "Apartment 1201, Tech View Towers, MG Road, Cyber City - 682016",
         phone: "+91 98765 43210",
-        email: "aisha.sharma@kmrl.com",
+        email: "aisha.sharma@iics.com",
         lastLogin: "10th Sept, 10:45PM",
         accessRoles: ["Operations Team", "Emergency Response", "Safety Auditor", "Owner"]
     };
@@ -118,7 +112,7 @@ const ProfilePage = () => {
 
             <Sidebar isOpen={isSidebarOpen} /> {/* Sidebar component */}
 
-            <Header currentLang={currentLanguage} toggleLanguage={toggleLanguage} />
+            <Header />
 
             <main className="profile-main-content">
                 {/* Hamburger menu button on the profile page */}

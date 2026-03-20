@@ -33,7 +33,7 @@ def convert_to_json_serializable(obj):
     return obj
 
 @app.post("/process")
-async def process_document(file: UploadFile = File(...), ocr_lang: str = "eng+mal"):
+async def process_document(file: UploadFile = File(...), ocr_lang: str = "eng"):
     if not HUGGINGFACE_TOKEN:
         raise HTTPException(500, detail="Backend Hugging Face API token is not configured.")
 
@@ -55,7 +55,7 @@ async def process_document(file: UploadFile = File(...), ocr_lang: str = "eng+ma
     important_dates = extract_dates_regex(text)
     tags = extract_tags_from_text(text)
     categories = detect_job_positions(text)
-    summary = generate_summary(text, token=HUGGINGFACE_TOKEN, lang="ml" if "mal" in ocr_lang else "en")
+    summary = generate_summary(text, token=HUGGINGFACE_TOKEN)
 
     if names:
         document_person_map[file.filename] = names

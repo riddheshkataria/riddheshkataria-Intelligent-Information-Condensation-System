@@ -50,7 +50,7 @@ def extract_tags(text: str, entities: list) -> list:
 
     # Add tags from a list of important keywords if present in text
     keywords = [
-        "metro expansion",
+        "system expansion",
         "csr",
         "public engagement",
         "eco-friendly",

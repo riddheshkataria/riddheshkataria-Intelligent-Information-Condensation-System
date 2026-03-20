@@ -9,7 +9,7 @@ import pytesseract
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 
-def extract_text_from_pdf(file_bytes, ocr_lang="eng+mal"):
+def extract_text_from_pdf(file_bytes, ocr_lang="eng"):
     """
     Extract text from a PDF file using PyMuPDF to render pages and Tesseract OCR.
 

@@ -15,7 +15,7 @@ function Landing() {
       {/* Header */}
       <header className="header">
         <div className="logo-section">
-          {/* <img src="/logo.png" alt="Kochi Metro Logo" className="header-logo" /> */}
+          {/* <img src="/logo.png" alt="IICS Logo" className="header-logo" /> */}
           <span className="header-text"><h1>IICS</h1></span>
         </div>
         <Link to="/login" className="login-button">Login</Link>
@@ -44,7 +44,7 @@ function Landing() {
             <span className="hero-title-line accent">Condensation System</span>
           </h1>
           <p className="hero-subtitle">
-            Empowering Kochi's public transport with seamless connectivity — a unified system with common timetabling, smart ticketing, and centralised command &amp; control.
+            Empowering enterprises with seamless connectivity — a unified Intelligent Information Condensation System with centralized command &amp; control.
           </p>
           <Link to="/login" className="hero-cta">
             Get Started

@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 def generate_summary(
     text: str,
     token: str,
-    lang: str = "ml",   # default Malayalam, can pass "en" if needed
+    lang: str = "en",   # english only
     max_length: int = 240,
     min_length: int = 20
 ) -> str:
@@ -18,7 +18,7 @@ def generate_summary(
     Args:
         text (str): Input text to summarize.
         token (str): Hugging Face auth token.
-        lang (str): Target summary language ("ml" for Malayalam, "en" for English).
+        lang (str): Target summary language ("en" for English).
         max_length (int): Max tokens in summary.
         min_length (int): Min tokens in summary.
 
