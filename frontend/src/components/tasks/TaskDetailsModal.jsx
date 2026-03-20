@@ -1,5 +1,13 @@
 import React from 'react';
-import { CloseIcon, TrashIcon, getUrgencyClass } from '../icons/Icons';
+import {
+    CloseIcon,
+    CompletedIcon,
+    FileIcon,
+    PendingIcon,
+    TrashIcon,
+    UndoIcon,
+    getUrgencyClass,
+} from '../icons/Icons';
 
 const TaskDetailsModal = ({ task, onClose, onToggle, onAccessDocument, onDelete }) => {
     if (!task) return null;
@@ -21,7 +29,10 @@ const TaskDetailsModal = ({ task, onClose, onToggle, onAccessDocument, onDelete 
                     <div className="detail-row">
                         <strong>Status:</strong>
                         <span className={`status-badge ${task.completed ? 'status-completed' : 'status-pending'}`}>
-                            {task.completed ? '✓ Completed' : '⏳ Pending'}
+                            <span className="status-badge-content">
+                                {task.completed ? <CompletedIcon /> : <PendingIcon />}
+                                {task.completed ? 'Completed' : 'Pending'}
+                            </span>
                         </span>
                     </div>
                 </div>
@@ -30,7 +41,10 @@ const TaskDetailsModal = ({ task, onClose, onToggle, onAccessDocument, onDelete 
                         className={`btn-toggle-status ${task.completed ? 'btn-undo' : 'btn-complete'}`}
                         onClick={(e) => { e.stopPropagation(); onToggle(); }}
                     >
-                        {task.completed ? '↩ Mark Incomplete' : '✓ Mark Complete'}
+                        <span className="btn-with-icon">
+                            {task.completed ? <UndoIcon /> : <CompletedIcon />}
+                            {task.completed ? 'Mark Incomplete' : 'Mark Complete'}
+                        </span>
                     </button>
                     <div className="footer-right-actions">
                         <button
@@ -38,7 +52,10 @@ const TaskDetailsModal = ({ task, onClose, onToggle, onAccessDocument, onDelete 
                             disabled={!task.relatedDocumentId}
                             onClick={() => onAccessDocument(task.relatedDocumentId)}
                         >
-                            📄 Access Document
+                            <span className="btn-with-icon">
+                                <FileIcon size={16} />
+                                Access Document
+                            </span>
                         </button>
                         <button className="btn-delete-task" onClick={(e) => { e.stopPropagation(); onDelete(); }}>
                             <TrashIcon />

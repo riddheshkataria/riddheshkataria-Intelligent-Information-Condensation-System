@@ -1,11 +1,11 @@
 import React, { useState, memo } from 'react';
 import { Link } from 'react-router-dom';
-import { SearchIcon, ProfileIcon } from '../icons/Icons';
+import { LanguageIcon, ProfileIcon, SearchIcon } from '../icons/Icons';
 import './Header.css';
 
 const Header = memo(() => {
     const [language, setLanguage] = useState('English');
-    const toggleLanguage = () => setLanguage((c) => (c === 'English' ? 'മലയാളം' : 'English'));
+    const toggleLanguage = () => setLanguage((current) => (current === 'English' ? 'Malayalam' : 'English'));
 
     return (
         <header className="dashboard-header">
@@ -18,7 +18,8 @@ const Header = memo(() => {
             </div>
             <div className="header-controls">
                 <button onClick={toggleLanguage} className="language-toggle">
-                    {language} <span>Aあ</span>
+                    <LanguageIcon />
+                    <span>{language}</span>
                 </button>
                 <Link to="/profile" className="profile-button" aria-label="Profile">
                     <ProfileIcon />

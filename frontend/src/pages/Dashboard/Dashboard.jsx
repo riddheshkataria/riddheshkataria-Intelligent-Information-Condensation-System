@@ -11,6 +11,13 @@ import TaskDetailsModal from '../../components/tasks/TaskDetailsModal';
 import AddTaskModal from '../../components/tasks/AddTaskModal';
 import DocumentManager from '../../components/documents/DocumentManager';
 import CalendarView from '../../components/calendar/CalendarView';
+import {
+    DocumentIcon,
+    OverdueIcon,
+    PlusIcon,
+    TodoIcon,
+    WarningIcon,
+} from '../../components/icons/Icons';
 
 // Hooks
 import { useTasks } from '../../hooks/useTasks';
@@ -40,20 +47,16 @@ function Dashboard() {
     const [isAddModalOpen, setAddModalOpen] = useState(false);
     const fileInputRef = useRef(null);
 
-    // Centralized error
     const error = taskError || docError;
     const clearError = useCallback(() => {
         clearTaskError();
         clearDocError();
     }, [clearTaskError, clearDocError]);
 
-    // Fetch data on mount
     useEffect(() => {
         fetchDocuments();
         fetchTasks();
     }, [fetchDocuments, fetchTasks]);
-
-    // --- Handlers (stable with useCallback) ---
 
     const handleToggleTaskStatus = useCallback(
         async (taskId, currentStatus) => {
@@ -89,8 +92,6 @@ function Dashboard() {
     const handleCloseAddModal = useCallback(() => setAddModalOpen(false), []);
     const handleCloseDetails = useCallback(() => setSelectedTask(null), []);
 
-    // --- Computed metrics (useMemo) ---
-
     const { overdue, upcoming, completionPercentage } = useMemo(() => {
         const now = new Date();
         let overdueCount = 0;
@@ -109,30 +110,88 @@ function Dashboard() {
             }
         });
 
-        const completed = tasks.filter((t) => t.completed).length;
+        const completed = tasks.filter((task) => task.completed).length;
         const pct = tasks.length > 0 ? Math.round((completed / tasks.length) * 100) : 0;
 
         return { overdue: overdueCount, upcoming: upcomingCount, completionPercentage: pct };
     }, [tasks]);
 
+    const completedTasks = useMemo(
+        () => tasks.filter((task) => task.completed).length,
+        [tasks]
+    );
+    const pendingTasks = tasks.length - completedTasks;
+    const highUrgency = useMemo(
+        () => tasks.filter((task) => task.urgency === 'High' && !task.completed).length,
+        [tasks]
+    );
+
+    const handleJumpToDocuments = useCallback(() => {
+        const section = document.querySelector('.document-manager-container');
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, []);
+
     return (
         <div className="dashboard-layout">
             <Header />
             <main className="dashboard-main-content">
-                <h1 className="main-title">Dashboard</h1>
+                <section className="overview-panel">
+                    <div className="overview-copy">
+                        <p className="overview-kicker">Operations Intelligence Hub</p>
+                        <h1 className="main-title">Operations Dashboard</h1>
+                        <p className="main-subtitle">
+                            Track priorities, monitor deadlines, and keep documents and execution tightly aligned.
+                        </p>
+                        <div className="overview-actions">
+                            <button type="button" className="overview-btn overview-btn-primary" onClick={handleOpenAddModal}>
+                                <PlusIcon />
+                                <span>New Task</span>
+                            </button>
+                            <button type="button" className="overview-btn" onClick={handleJumpToDocuments}>
+                                <DocumentIcon />
+                                <span>Jump to Documents</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div className="overview-stats">
+                        <article className="overview-stat">
+                            <span className="overview-stat-icon"><TodoIcon /></span>
+                            <div>
+                                <p className="overview-stat-label">Pending</p>
+                                <p className="overview-stat-value">{pendingTasks}</p>
+                            </div>
+                        </article>
+                        <article className="overview-stat">
+                            <span className="overview-stat-icon"><WarningIcon /></span>
+                            <div>
+                                <p className="overview-stat-label">High Urgency</p>
+                                <p className="overview-stat-value">{highUrgency}</p>
+                            </div>
+                        </article>
+                        <article className="overview-stat">
+                            <span className="overview-stat-icon"><OverdueIcon /></span>
+                            <div>
+                                <p className="overview-stat-label">Overdue</p>
+                                <p className="overview-stat-value">{overdue}</p>
+                            </div>
+                        </article>
+                    </div>
+                </section>
 
                 {error && (
-                    <div className="error-banner" onClick={clearError}>
-                        ⚠️ {error} — <span>click to dismiss</span>
-                    </div>
+                    <button type="button" className="error-banner" onClick={clearError}>
+                        <WarningIcon size={18} />
+                        <span>{error}</span>
+                        <small>Click to dismiss</small>
+                    </button>
                 )}
 
-                <div className="dashboard-widgets">
+                <div className="dashboard-widgets dashboard-section">
                     <KeyMetrics overdue={overdue} upcoming={upcoming} totalDocs={documents.length} />
                     <CircularProgressBar percentage={completionPercentage} />
                 </div>
 
-                <section className="main-content-grid">
+                <section className="main-content-grid dashboard-section">
                     <TodoList tasks={tasks} onTaskClick={setSelectedTask} onAddTaskClick={handleOpenAddModal} />
                     <CalendarView tasks={tasks} />
                 </section>
@@ -145,11 +204,14 @@ function Dashboard() {
             </main>
             <Footer />
 
-            {/* Modals */}
             <TaskDetailsModal
                 task={selectedTask}
                 onClose={handleCloseDetails}
-                onToggle={selectedTask ? () => handleToggleTaskStatus(selectedTask.id, selectedTask.status) : undefined}
+                onToggle={
+                    selectedTask
+                        ? () => handleToggleTaskStatus(selectedTask.id, selectedTask.completed ? 'completed' : 'pending')
+                        : undefined
+                }
                 onAccessDocument={handleAccessDocument}
                 onDelete={selectedTask ? () => handleDeleteTask(selectedTask.id) : undefined}
             />

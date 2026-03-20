@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, memo } from 'react';
+import { ChevronLeftIcon, ChevronRightIcon } from '../icons/Icons';
 
 const CalendarView = memo(({ tasks }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -41,9 +42,13 @@ const CalendarView = memo(({ tasks }) => {
     return (
         <div className="calendar-container">
             <div className="calendar-header">
-                <button onClick={() => changeMonth(-1)}>‹</button>
+                <button className="calendar-nav-btn" onClick={() => changeMonth(-1)} aria-label="Previous month">
+                    <ChevronLeftIcon />
+                </button>
                 <h3>{monthName} {year}</h3>
-                <button onClick={() => changeMonth(1)}>›</button>
+                <button className="calendar-nav-btn" onClick={() => changeMonth(1)} aria-label="Next month">
+                    <ChevronRightIcon />
+                </button>
             </div>
             <div className="calendar-grid">
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (

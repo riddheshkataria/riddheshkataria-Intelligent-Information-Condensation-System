@@ -24,6 +24,19 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
     letter-spacing: -0.02em;
+    position: relative;
+}
+
+.logo-text::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    position: absolute;
+    top: 5px;
+    right: -10px;
+    box-shadow: 0 0 10px rgba(20, 184, 166, 0.6);
 }
 
 .search-bar {
@@ -81,9 +94,14 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     transition: var(--transition);
     font-family: inherit;
+}
+
+.language-toggle svg {
+    width: 14px;
+    height: 14px;
 }
 
 .language-toggle:hover {

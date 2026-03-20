@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CloseIcon, PlusIcon } from '../icons/Icons';
+import { CloseIcon, PlusIcon, SparklesIcon } from '../icons/Icons';
 
 const AddTaskModal = ({ isOpen, onClose, onAddTask, documents }) => {
     const [text, setText] = useState('');
@@ -43,7 +43,10 @@ const AddTaskModal = ({ isOpen, onClose, onAddTask, documents }) => {
         <div className="modal-backdrop" onClick={onClose}>
             <div className="modal-content add-task-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="add-modal-header">
-                    <h2>✨ New Task</h2>
+                    <h2 className="modal-title-with-icon">
+                        <SparklesIcon />
+                        <span>New Task</span>
+                    </h2>
                     <button className="btn-close" onClick={onClose}><CloseIcon /></button>
                 </div>
                 <form onSubmit={handleSubmit}>
@@ -80,7 +83,12 @@ const AddTaskModal = ({ isOpen, onClose, onAddTask, documents }) => {
                     </div>
                     <div className="modal-actions">
                         <button type="button" className="btn-cancel" onClick={onClose}>Cancel</button>
-                        <button type="submit" className="btn-add"><PlusIcon /> Add Task</button>
+                        <button type="submit" className="btn-add">
+                            <span className="btn-with-icon">
+                                <PlusIcon />
+                                Add Task
+                            </span>
+                        </button>
                     </div>
                 </form>
             </div>

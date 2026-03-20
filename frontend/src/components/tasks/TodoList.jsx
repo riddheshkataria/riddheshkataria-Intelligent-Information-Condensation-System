@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { PlusIcon, CheckIcon, getUrgencyClass } from '../icons/Icons';
+import { CheckIcon, FileIcon, PlusIcon, TodoIcon, getUrgencyClass } from '../icons/Icons';
 
 const TodoList = memo(({ tasks, onTaskClick, onAddTaskClick }) => {
     const now = new Date();
@@ -13,9 +13,13 @@ const TodoList = memo(({ tasks, onTaskClick, onAddTaskClick }) => {
     return (
         <div className="todo-list-container">
             <div className="todo-header">
-                <h2>📋 To-Do List</h2>
+                <h2 className="todo-title">
+                    <TodoIcon />
+                    <span>To-Do List</span>
+                </h2>
                 <button className="add-task-btn" onClick={onAddTaskClick}>
-                    <PlusIcon /> Add Task
+                    <PlusIcon />
+                    <span>Add Task</span>
                 </button>
             </div>
             <div className="todo-grid-header">
@@ -27,8 +31,8 @@ const TodoList = memo(({ tasks, onTaskClick, onAddTaskClick }) => {
             </div>
             {tasks.length === 0 ? (
                 <div className="empty-state">
-                    <span className="empty-icon">📝</span>
-                    <p>No tasks yet. Create your first task!</p>
+                    <span className="empty-icon" aria-hidden="true"><FileIcon size={26} /></span>
+                    <p>No tasks yet. Create your first task.</p>
                 </div>
             ) : (
                 <ul className="todo-grid">
@@ -39,7 +43,7 @@ const TodoList = memo(({ tasks, onTaskClick, onAddTaskClick }) => {
                             onClick={() => onTaskClick(task)}
                         >
                             <span className={isOverdue(task) ? 'task-overdue' : 'task-name'}>{task.text}</span>
-                            <span className={isOverdue(task) ? 'task-overdue' : 'task-deadline'}>{task.deadline || '—'}</span>
+                            <span className={isOverdue(task) ? 'task-overdue' : 'task-deadline'}>{task.deadline || '--'}</span>
                             <span>
                                 <span className={`urgency-badge ${getUrgencyClass(task.urgency)}`}>
                                     {task.urgency || 'Low'}
