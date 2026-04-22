@@ -4,6 +4,7 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import { ArchiveIcon, DatabaseIcon, SearchIcon, StarIcon, UploadIcon } from './components/icons/Icons';
 import databaseStyles from './Database.css?raw';
+import { useDocuments } from './hooks/useDocuments';
 
 const MenuIcon = () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -38,16 +39,17 @@ const sidebarItems = [
 ];
 
 const ArchivePage = () => {
+    const { documents: allDocuments, fetchDocuments, toggleStar } = useDocuments();
     const [isSidebarOpen, setSidebarOpen] = useState(false);
     const [viewMode, setViewMode] = useState('table');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
-    const [documents, setDocuments] = useState([]);
-
+    
     useEffect(() => {
-        const archives = JSON.parse(localStorage.getItem('archivedDocs') || '[]');
-        setDocuments(archives);
-    }, []);
+        fetchDocuments();
+    }, [fetchDocuments]);
+
+    const documents = useMemo(() => allDocuments.filter(doc => doc.isArchived), [allDocuments]);
 
     const starredCount = useMemo(
         () => documents.filter((doc) => doc.isStarred).length,
@@ -86,11 +88,7 @@ const ArchivePage = () => {
     };
 
     const handleStarToggle = (docId) => {
-        const updatedDocs = documents.map((doc) =>
-            doc.id === docId ? { ...doc, isStarred: !doc.isStarred } : doc
-        );
-        setDocuments(updatedDocs);
-        localStorage.setItem('archivedDocs', JSON.stringify(updatedDocs));
+        toggleStar(docId);
     };
 
     return (

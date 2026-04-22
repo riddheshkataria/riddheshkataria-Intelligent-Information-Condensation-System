@@ -11,6 +11,7 @@ const formatDoc = (doc) => ({
     status: doc.status,
     starred: false,
     view: 'recent',
+    isArchived: doc.isArchived || false,
 });
 
 export const useDocuments = () => {

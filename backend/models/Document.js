@@ -60,6 +60,10 @@ const documentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     }],
+    isArchived: {
+      type: Boolean,
+      default: false,
+    },
     // Link to the user who uploaded it (we'll use this later for RBAC)
     // uploadedBy: {
     //   type: mongoose.Schema.Types.ObjectId,

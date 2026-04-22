@@ -177,21 +177,13 @@ const DocumentView = () => {
                             <button 
                                 type="button" 
                                 className="document-action-btn document-action-btn-secondary"
-                                onClick={() => {
-                                    const archives = JSON.parse(localStorage.getItem('archivedDocs') || '[]');
-                                    if (!archives.some(doc => doc.id === id)) {
-                                        archives.push({
-                                            id: id,
-                                            title: document.originalFilename,
-                                            description: typeof document.summary === 'string' ? document.summary.substring(0, 100) + '...' : 'Archived document',
-                                            category: document.documentType || 'Archived',
-                                            time: new Date().toLocaleTimeString(),
-                                            isStarred: false
-                                        });
-                                        localStorage.setItem('archivedDocs', JSON.stringify(archives));
+                                onClick={async () => {
+                                    try {
+                                        const { archiveDocument } = await import('./services/api.js');
+                                        await archiveDocument(id);
                                         alert('Document archived successfully!');
-                                    } else {
-                                        alert('Document is already in the archive.');
+                                    } catch (err) {
+                                        alert('Failed to archive document: ' + err.message);
                                     }
                                 }}
                             >

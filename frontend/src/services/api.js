@@ -46,6 +46,15 @@ export const getDocumentStatus = async (documentId) => {
     return response.json();
 };
 
+export const archiveDocument = async (documentId) => {
+    const response = await fetch(`${API_BASE_URL}/docs/${documentId}/archive`, {
+        method: 'POST',
+        headers: authHeaders(),
+    });
+    if (!response.ok) throw new Error('Failed to archive document');
+    return response.json();
+};
+
 // --- Task APIs ---
 
 export const getTasks = async () => {
