@@ -1,29 +1,39 @@
-import React, { useState } from 'react';
-import './DocumentView.css';
-import { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // Make sure useNavigate is also imported
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import Header from './components/layout/Header';
+import Footer from './components/layout/Footer';
+import { ArchiveIcon, ChevronLeftIcon } from './components/icons/Icons';
 import { getDocumentStatus } from './services/api.js';
+import './DocumentView.css';
 
-// --- Reusable Icons ---
-const ProfileIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>;
-const ArrowLeftIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>;
-const ArchiveIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>;
-const MailIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>;
-const PhoneIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>;
-
-// --- Header Component ---
-const PageHeader = () => (
-    <header className="page-header">
-        <div className="logo-section"><img src="/logo.png" alt="IICS Logo" className="header-logo" /><span className="header-title">IICS</span></div>
-        <div className="header-controls"><button className="profile-button" aria-label="Profile"><ProfileIcon /></button></div>
-    </header>
+const MailIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+        <polyline points="22,6 12,13 2,6" />
+    </svg>
 );
 
-// --- Main Document View Component ---
-// REPLACE your old DocumentView function with this
+const getStatusClass = (status) => {
+    const normalizedStatus = (status || '').toLowerCase();
+
+    if (normalizedStatus === 'completed') {
+        return 'status-completed';
+    }
+
+    if (normalizedStatus === 'pending') {
+        return 'status-pending';
+    }
+
+    if (normalizedStatus === 'failed' || normalizedStatus === 'error') {
+        return 'status-failed';
+    }
+
+    return 'status-processing';
+};
+
 const DocumentView = () => {
     const navigate = useNavigate();
-    const { id } = useParams(); // Get the document ID from the URL
+    const { id } = useParams();
 
     const [document, setDocument] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -35,97 +45,175 @@ const DocumentView = () => {
             try {
                 const docData = await getDocumentStatus(id);
                 setDocument(docData);
-                // Default the selected user to be the document's owner
-                if (docData.user) {
+
+                if (docData?.user) {
                     setSelectedUser(docData.user);
                 }
-            } catch (err) {
-                setError(err.message);
+            } catch (fetchError) {
+                setError(fetchError.message);
             } finally {
                 setLoading(false);
             }
         };
+
         fetchDocument();
     }, [id]);
 
-    const handleFetchOriginal = () => {
+    const usersWithAccess = useMemo(() => {
+        if (!document) {
+            return [];
+        }
+
+        return [document.user, ...(document.sharedWith || [])].filter(Boolean);
+    }, [document]);
+
+    const summaryParagraphs = useMemo(() => {
+        const summaryText = typeof document?.summary === 'string'
+            ? document.summary
+            : 'No summary available.';
+        const parsedParagraphs = summaryText
+            .split(/\n+/)
+            .map((paragraph) => paragraph.trim())
+            .filter(Boolean);
+
+        return parsedParagraphs.length > 0 ? parsedParagraphs : ['No summary available.'];
+    }, [document]);
+
+    const handleFetchOriginal = async () => {
         const token = localStorage.getItem('userToken');
         const fileUrl = `http://localhost:5000/api/docs/file/${id}`;
 
-        fetch(fileUrl, { headers: { 'Authorization': `Bearer ${token}` } })
-            .then(res => res.blob())
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                window.open(url, '_blank'); // Opens the PDF in a new tab
-            })
-            .catch(err => {
-                console.error("Failed to fetch document file:", err);
-                setError("Could not open document.");
+        try {
+            const response = await fetch(fileUrl, {
+                headers: { Authorization: `Bearer ${token}` },
             });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch original document.');
+            }
+
+            const blob = await response.blob();
+            const fileObjectUrl = window.URL.createObjectURL(blob);
+            window.open(fileObjectUrl, '_blank');
+        } catch (fetchError) {
+            console.error('Failed to fetch document file:', fetchError);
+            setError('Could not open document.');
+        }
     };
 
-    const handleGoBack = () => navigate(-1);
+    const renderFeedbackState = (message) => (
+        <div className="document-page">
+            <Header />
+            <main className="document-main-content">
+                <div className="document-feedback-card">{message}</div>
+            </main>
+            <Footer />
+        </div>
+    );
 
-    if (loading) return <div>Loading document...</div>;
-    if (error) return <div>Error: {error}</div>;
-    if (!document) return <div>Document not found.</div>;
+    if (loading) {
+        return renderFeedbackState('Loading document...');
+    }
 
-    // Combine the owner and shared users into one list for display
-    const usersWithAccess = [document.user, ...document.sharedWith].filter(Boolean);
+    if (error) {
+        return renderFeedbackState(`Error: ${error}`);
+    }
+
+    if (!document) {
+        return renderFeedbackState('Document not found.');
+    }
 
     return (
-        <div className="document-view-page">
-            <PageHeader />
-            <main className="document-container">
-                <button className="previous-page-btn" onClick={handleGoBack}><ArrowLeftIcon /><span>Back</span></button>
+        <div className="document-page">
+            <Header />
 
-                <div className="content-grid">
-                    <div className="document-details-column">
-                        <div className="document-header">
-                            <h1>{document.originalFilename}</h1>
-                            <div className="document-meta">
-                                <span>Status: <strong>{document.status}</strong></span>
-                            </div>
-                        </div>
-                        <section className="summary-section">
-                            <h2>Generated Summary</h2>
-                            <div className="summary-content-box">
-                                <p>{document.summary || "No summary available."}</p>
-                            </div>
-                        </section>
-                        <div className="document-actions">
-                            <button className="action-btn fetch-btn" onClick={handleFetchOriginal}>Fetch Original Document</button>
-                            <button className="action-btn archive-btn">
-                                <span>Archive</span><ArchiveIcon />
-                            </button>
+            <main className="document-main-content">
+                <section className="document-overview-panel">
+                    <div className="document-overview-copy">
+                        <p className="document-kicker">Operations Intelligence Hub</p>
+                        <h1>{document.originalFilename}</h1>
+                        <p>
+                            Review document status, generated summary, and everyone who currently has access.
+                        </p>
+                        <div className="document-status-row">
+                            <span className={`status-badge ${getStatusClass(document.status)}`}>
+                                Status: {document.status || 'Unknown'}
+                            </span>
                         </div>
                     </div>
 
-                    <aside className="user-access-column">
-                        <h2>Users with Access</h2>
-                        <ul className="user-list">
-                            {usersWithAccess.map(user => (
-                                <li
-                                    key={user._id}
-                                    className={`user-item ${selectedUser && selectedUser._id === user._id ? 'active' : ''}`}
-                                    onClick={() => setSelectedUser(user)}
-                                >
-                                    {user.name}
+                    <div className="document-overview-actions">
+                        <button type="button" className="document-outline-btn" onClick={() => navigate(-1)}>
+                            <ChevronLeftIcon size={16} />
+                            <span>Back</span>
+                        </button>
+                        <Link to="/database" className="document-outline-btn">
+                            Open Database
+                        </Link>
+                    </div>
+                </section>
+
+                <section className="document-content-grid">
+                    <article className="document-summary-card">
+                        <div className="document-card-header">
+                            <h2>Generated Summary</h2>
+                            <p>AI generated condensed insights from the source document.</p>
+                        </div>
+
+                        <div className="document-summary-body">
+                            {summaryParagraphs.map((paragraph, index) => (
+                                <p key={`summary-${index}`}>{paragraph}</p>
+                            ))}
+                        </div>
+
+                        <div className="document-action-row">
+                            <button
+                                type="button"
+                                className="document-action-btn document-action-btn-primary"
+                                onClick={handleFetchOriginal}
+                            >
+                                Fetch Original Document
+                            </button>
+                            <button type="button" className="document-action-btn document-action-btn-secondary">
+                                <span>Archive</span>
+                                <ArchiveIcon size={18} />
+                            </button>
+                        </div>
+                    </article>
+
+                    <aside className="document-access-card">
+                        <div className="document-card-header">
+                            <h2>Users with Access</h2>
+                        </div>
+
+                        <ul className="document-user-list">
+                            {usersWithAccess.map((user, index) => (
+                                <li key={`user-${user.email || user.name || index}`}>
+                                    <button
+                                        type="button"
+                                        className={`document-user-item ${selectedUser === user ? 'active' : ''}`}
+                                        onClick={() => setSelectedUser(user)}
+                                    >
+                                        {user.name}
+                                    </button>
                                 </li>
                             ))}
                         </ul>
+
                         {selectedUser && (
-                            <div className="user-details-box">
+                            <div className="document-user-details">
                                 <h3>{selectedUser.name}</h3>
-                                <div className="contact-info">
-                                    <span><MailIcon /> {selectedUser.email}</span>
-                                    {/* Phone number can be added to the User model later */}
-                                </div>
+                                <p>
+                                    <MailIcon />
+                                    <span>{selectedUser.email}</span>
+                                </p>
                             </div>
                         )}
                     </aside>
-                </div>
+                </section>
             </main>
+
+            <Footer />
         </div>
     );
 };
