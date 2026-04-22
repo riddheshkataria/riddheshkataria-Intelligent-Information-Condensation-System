@@ -97,3 +97,15 @@ export const loginUser = async (email, password) => {
     if (!response.ok) throw new Error(data.message || 'Login failed');
     return data;
 };
+
+export const getCurrentUser = async () => {
+    const response = await fetch(`${API_BASE_URL}/users/me`, {
+        headers: authHeaders(),
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch user profile');
+    }
+
+    return response.json();
+};

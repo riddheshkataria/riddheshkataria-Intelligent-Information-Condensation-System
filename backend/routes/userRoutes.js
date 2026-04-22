@@ -2,7 +2,9 @@ import express from 'express';
 import {
   registerUser,
   loginUser,
+  getCurrentUser,
 } from '../controllers/userController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -15,5 +17,10 @@ router.post('/register', registerUser);
 // @desc    Authenticate user & get token
 // @access  Public
 router.post('/login', loginUser);
+
+// @route   GET /api/users/me
+// @desc    Get current logged in user
+// @access  Private
+router.get('/me', protect, getCurrentUser);
 
 export default router;
