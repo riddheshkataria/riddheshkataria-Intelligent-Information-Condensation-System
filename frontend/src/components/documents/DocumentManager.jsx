@@ -21,10 +21,10 @@ const DocumentManager = memo(({ documents, toggleStar, onUploadClick }) => {
                     <DatabaseIcon />
                     <span>Database</span>
                 </Link>
-                <button className="action-btn">
+                <Link to="/archive" className="action-btn">
                     <ArchiveIcon />
                     <span>Archive</span>
-                </button>
+                </Link>
             </div>
 
             {uploadOpen && <Upload onClose={handleCloseUpload} onUpload={onUploadClick} />}

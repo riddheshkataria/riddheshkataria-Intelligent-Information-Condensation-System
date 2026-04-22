@@ -11,6 +11,7 @@ const LoginPage = lazy(() => import('./LoginPage'));
 const DocumentView = lazy(() => import('./DocumentView'));
 const Database = lazy(() => import('./Database'));
 const ProfilePage = lazy(() => import('./ProfilePage'));
+const ArchivePage = lazy(() => import('./ArchivePage'));
 
 // Loading fallback
 const PageLoader = () => (
@@ -30,6 +31,7 @@ function App() {
           <Route path="/database" element={<Database />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/document/:id" element={<DocumentView />} />
+          <Route path="/archive" element={<ArchivePage />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Suspense>

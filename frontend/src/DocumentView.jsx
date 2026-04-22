@@ -174,7 +174,27 @@ const DocumentView = () => {
                             >
                                 Fetch Original Document
                             </button>
-                            <button type="button" className="document-action-btn document-action-btn-secondary">
+                            <button 
+                                type="button" 
+                                className="document-action-btn document-action-btn-secondary"
+                                onClick={() => {
+                                    const archives = JSON.parse(localStorage.getItem('archivedDocs') || '[]');
+                                    if (!archives.some(doc => doc.id === id)) {
+                                        archives.push({
+                                            id: id,
+                                            title: document.originalFilename,
+                                            description: typeof document.summary === 'string' ? document.summary.substring(0, 100) + '...' : 'Archived document',
+                                            category: document.documentType || 'Archived',
+                                            time: new Date().toLocaleTimeString(),
+                                            isStarred: false
+                                        });
+                                        localStorage.setItem('archivedDocs', JSON.stringify(archives));
+                                        alert('Document archived successfully!');
+                                    } else {
+                                        alert('Document is already in the archive.');
+                                    }
+                                }}
+                            >
                                 <span>Archive</span>
                                 <ArchiveIcon size={18} />
                             </button>
