@@ -41,7 +41,20 @@ export const processDocumentWithGemini = async (filePath, mimeType = 'applicatio
     Return ONLY the raw JSON object matching the requested schema. Do not enclose it in markdown blocks (\`\`\`json). I will parse it directly.
     `;
 
-    const result = await model.generateContent([filePart, prompt]);
+    let result;
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        result = await model.generateContent([filePart, prompt]);
+        break;
+      } catch (error) {
+        console.warn(`Gemini API Warning. Retries left: ${retries - 1}. Error: ${error.message}`);
+        retries--;
+        if (retries === 0) throw error;
+        await new Promise(resolve => setTimeout(resolve, 2000)); // wait 2s before retry
+      }
+    }
+
     let responseText = result.response.text();
 
     // Sometimes the model might wrap response in markdown code blocks anyway

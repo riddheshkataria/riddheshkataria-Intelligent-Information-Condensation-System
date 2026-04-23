@@ -12,6 +12,10 @@ const protect = async (req, res, next) => {
       // Get token from header (e.g., "Bearer eyJhbGci...")
       token = req.headers.authorization.split(' ')[1];
 
+      if (!token || token === 'null' || token === 'undefined') {
+        return res.status(401).json({ message: 'Not authorized, invalid token format' });
+      }
+
       // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -21,7 +25,7 @@ const protect = async (req, res, next) => {
 
       next(); // Move on to the next step (the actual controller)
     } catch (error) {
-      console.error(error);
+      console.error("JWT Error:", error.message);
       res.status(401).json({ message: 'Not authorized, token failed' });
       return; // Stop execution
     }
