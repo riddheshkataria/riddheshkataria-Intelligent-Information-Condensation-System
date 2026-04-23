@@ -259,7 +259,23 @@ export const getDocumentFile = async (req, res) => {
     }
 
     // This sends the file from the path stored in the database
-    res.sendFile(path.resolve(document.storagePath));
+    const fullPath = path.resolve(document.storagePath);
+    
+    try {
+      // Check if the file actually exists on the filesystem
+      await fs.access(fullPath);
+      res.sendFile(fullPath, (err) => {
+        if (err) {
+          console.error('Error sending file:', err);
+          if (!res.headersSent) {
+            res.status(500).json({ message: 'Error sending file' });
+          }
+        }
+      });
+    } catch (fsError) {
+      console.error('File missing on disk:', fullPath);
+      return res.status(404).json({ message: 'The requested document file no longer exists on the server.' });
+    }
 
   } catch (error) {
     console.error(error);
