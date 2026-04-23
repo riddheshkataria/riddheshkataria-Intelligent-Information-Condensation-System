@@ -97,8 +97,8 @@ const processDocument = async (docId, filePath) => {
 export const getDocById = async (req, res) => {
   try {
     const doc = await Document.findById(req.params.id)
-      .populate('user', 'name email') // Populate the owner's details
-      .populate('sharedWith', 'name email'); // Populate the details of users it's shared with
+      .populate('user', 'name email role') // Populate the owner's details
+      .populate('sharedWith', 'name email role'); // Populate the details of users it's shared with
     if (!doc) {
       return res.status(404).json({ error: 'Document not found.' });
     }
@@ -175,7 +175,7 @@ export const shareDocument = async (req, res) => {
     if (document.user.toString() === userToShareWith._id.toString()) {
       return res.status(400).json({ message: 'Cannot share document with the owner.' });
     }
-    if (document.sharedWith.includes(userToShareWith._id)) {
+    if (document.sharedWith.some(id => id.toString() === userToShareWith._id.toString())) {
       return res.status(400).json({ message: 'Document already shared with this user.' });
     }
 
@@ -206,17 +206,26 @@ const createAndRouteTask = async (document) => {
       targetRole = 'Manager';
     }
 
-    const targetUser = await User.findOne({ role: targetRole });
+    const targetUsers = await User.find({ role: targetRole });
 
-    if (targetUser) {
-      await Task.create({
+    if (targetUsers && targetUsers.length > 0) {
+      // 1. Create tasks for all users
+      const tasksToCreate = targetUsers.map(user => ({
         title: taskTitle,
         description: taskDescription,
-        assignedTo: targetUser._id,
+        assignedTo: user._id,
         relatedDocument: document._id,
         status: 'pending',
+      }));
+      await Task.insertMany(tasksToCreate);
+
+      // 2. Add these users to the document's sharedWith array so they can access it
+      const newAssigneeIds = targetUsers.map(user => user._id);
+      await Document.findByIdAndUpdate(document._id, {
+        $addToSet: { sharedWith: { $each: newAssigneeIds } }
       });
-      console.log(`✅ Task created for document ${document._id} and assigned to ${targetUser.email}`);
+
+      console.log(`✅ Tasks created for document ${document._id} and assigned to ${targetUsers.length} users with role: ${targetRole}`);
     } else {
       console.warn(`⚠️ No user found with role: "${targetRole}" for document ${document._id}. Task not created.`);
     }
@@ -243,7 +252,7 @@ export const getDocumentFile = async (req, res) => {
 
     // Security Check: Ensure the user owns the document or it's shared with them
     const isOwner = document.user.toString() === req.user.id;
-    const isShared = document.sharedWith.includes(req.user.id);
+    const isShared = document.sharedWith.some(id => id.toString() === req.user.id);
 
     if (!isOwner && !isShared) {
       return res.status(401).json({ message: 'User not authorized to access this file' });
