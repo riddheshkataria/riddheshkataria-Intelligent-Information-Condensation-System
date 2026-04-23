@@ -197,20 +197,13 @@ const createAndRouteTask = async (document) => {
     let taskDescription = `Please review the attached document summary. Type: ${document.documentType}.`;
 
     // This is the business logic for routing based on document type
-    switch (document.documentType.toLowerCase()) {
-      case 'tender':
-        targetRole = 'Procurement Officer';
-        taskDescription = `A new tender document requires your attention. Due Date: ${findEntity(document.entities, 'DUE_DATE')}`;
-        break;
-      case 'legal opinion':
-        targetRole = 'Legal Advisor';
-        break;
-      case 'safety circular':
-      case 'safety bulletin':
-        targetRole = 'Station Controller';
-        break;
-      default:
-        targetRole = 'Manager'; // Default assignment
+    const docTypeLower = document.documentType.toLowerCase();
+    if (['engineer', 'admin', 'manager'].includes(docTypeLower)) {
+      // Capitalize the first letter for the role
+      targetRole = docTypeLower.charAt(0).toUpperCase() + docTypeLower.slice(1);
+    } else {
+      // Default fallback
+      targetRole = 'Manager';
     }
 
     const targetUser = await User.findOne({ role: targetRole });

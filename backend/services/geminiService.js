@@ -33,7 +33,7 @@ export const processDocumentWithGemini = async (filePath, mimeType = 'applicatio
     Analyze the attached document and provide a structured JSON output with the following exact keys:
     - "summary": A concise summary of the document.
     - "entities": A list of important entities (organizations, locations, concepts, etc.) found in the document.
-    - "categories": A list of applicable categories for the document (e.g. "Operations & Maintenance", "Finance", "Human Resources", "Safety & Security", "Legal", "General").
+    - "categories": A list containing exactly one category for the document. You MUST choose from the following list: "Engineer", "Admin", "Manager".
     - "tags": A list of relevant lowercase keywords representing the topics of the document.
     - "important_dates": A list of any important dates or deadlines mentioned.
     - "names": A list of full names of people mentioned in the document.
