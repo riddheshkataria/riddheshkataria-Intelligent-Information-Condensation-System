@@ -1,4 +1,4 @@
-.database-page {
+const n=`.database-page {
     min-height: 100vh;
     background:
         radial-gradient(circle at 0% 0%, rgba(20, 184, 166, 0.12), transparent 28%),
@@ -540,3 +540,4 @@
         justify-content: space-between;
     }
 }
+`;export{n as d};

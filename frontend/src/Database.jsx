@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
@@ -65,12 +65,15 @@ const sidebarItems = [
     { label: 'Uploaded Documents', icon: UploadIcon, active: false },
 ];
 
+const ITEMS_PER_PAGE = 9;
+
 const DatabasePage = () => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
     const [viewMode, setViewMode] = useState('table');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [documents, setDocuments] = useState(initialMockData);
+    const [currentPage, setCurrentPage] = useState(1);
 
     const starredCount = useMemo(
         () => documents.filter((doc) => doc.isStarred).length,
@@ -103,6 +106,22 @@ const DatabasePage = () => {
 
         return filtered;
     }, [documents, searchQuery, selectedCategory]);
+
+    const totalPages = Math.max(1, Math.ceil(filteredDocuments.length / ITEMS_PER_PAGE));
+    const pageStartIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const paginatedDocuments = filteredDocuments.slice(pageStartIndex, pageStartIndex + ITEMS_PER_PAGE);
+    const showingFrom = filteredDocuments.length === 0 ? 0 : pageStartIndex + 1;
+    const showingTo = Math.min(pageStartIndex + ITEMS_PER_PAGE, filteredDocuments.length);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, selectedCategory]);
+
+    useEffect(() => {
+        if (currentPage > totalPages) {
+            setCurrentPage(totalPages);
+        }
+    }, [currentPage, totalPages]);
 
     const toggleSidebar = () => {
         setSidebarOpen((previous) => !previous);
@@ -242,7 +261,7 @@ const DatabasePage = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredDocuments.map((document) => (
+                                    {paginatedDocuments.map((document) => (
                                         <tr key={document.id}>
                                             <td>
                                                 <button
@@ -269,7 +288,7 @@ const DatabasePage = () => {
                         </div>
                     ) : (
                         <div className="database-card-grid">
-                            {filteredDocuments.map((document) => (
+                            {paginatedDocuments.map((document) => (
                                 <article key={document.id} className="database-card">
                                     <div className="database-card-head">
                                         <span>{document.category}</span>
@@ -291,6 +310,31 @@ const DatabasePage = () => {
                                     <small>{document.time}</small>
                                 </article>
                             ))}
+                        </div>
+                    )}
+
+                    {filteredDocuments.length > 0 && (
+                        <div className="database-pagination">
+                            <p className="database-pagination-summary">
+                                Showing {showingFrom}-{showingTo} of {filteredDocuments.length}
+                            </p>
+                            <div className="database-pagination-controls">
+                                <button
+                                    type="button"
+                                    onClick={() => setCurrentPage((previous) => Math.max(1, previous - 1))}
+                                    disabled={currentPage === 1}
+                                >
+                                    Previous
+                                </button>
+                                <span>Page {currentPage} of {totalPages}</span>
+                                <button
+                                    type="button"
+                                    onClick={() => setCurrentPage((previous) => Math.min(totalPages, previous + 1))}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    Next
+                                </button>
+                            </div>
                         </div>
                     )}
                 </section>
