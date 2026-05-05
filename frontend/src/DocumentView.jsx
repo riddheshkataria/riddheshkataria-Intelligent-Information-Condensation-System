@@ -4,6 +4,7 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import { ArchiveIcon, ChevronLeftIcon } from './components/icons/Icons';
 import { getDocumentStatus } from './services/api.js';
+import DocumentChat from './components/DocumentChat';
 import './DocumentView.css';
 
 const MailIcon = () => (
@@ -222,6 +223,10 @@ const DocumentView = () => {
                             </div>
                         )}
                     </aside>
+                </section>
+
+                <section className="document-chat-section">
+                    <DocumentChat documentId={id} />
                 </section>
             </main>
 

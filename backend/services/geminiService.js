@@ -12,7 +12,7 @@ export const processDocumentWithGemini = async (filePath, mimeType = 'applicatio
   const genAI = new GoogleGenerativeAI(apiKey);
 
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-flash-latest',
     generationConfig: {
       responseMimeType: 'application/json',
     }
@@ -65,6 +65,68 @@ export const processDocumentWithGemini = async (filePath, mimeType = 'applicatio
 
   } catch (error) {
     console.error("Error processing document with Gemini:", error);
+    throw error;
+  }
+};
+
+export const chatWithDocument = async (filePath, mimeType = 'application/pdf', history = [], message) => {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is missing in environment variables.");
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  // We use flash for chat since it's fast and has large context
+  const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
+
+  try {
+    const fileBuffer = await fs.readFile(filePath);
+    
+    const filePart = {
+      inlineData: {
+        data: fileBuffer.toString("base64"),
+        mimeType
+      }
+    };
+
+    // Construct the contents array for the chat history
+    const contents = [];
+    
+    for (let i = 0; i < history.length; i++) {
+        const item = history[i];
+        const parts = [{ text: item.text }];
+        
+        // Inject the document into the very first user message of the conversation
+        if (i === 0 && item.role === 'user') {
+            parts.unshift(filePart);
+            parts[1].text = `Document Context:\n(Attached File)\n\nUser Question:\n${item.text}`;
+        }
+        
+        contents.push({
+            role: item.role,
+            parts: parts
+        });
+    }
+
+    // Now handle the new message
+    const newMessageParts = [{ text: message }];
+    
+    // If history was empty, this new message is the first message
+    if (history.length === 0) {
+        newMessageParts.unshift(filePart);
+        newMessageParts[1].text = `You are a helpful AI assistant. Answer the user's questions based primarily on the attached document. If the document does not contain the answer, say so.\n\nUser Question:\n${message}`;
+    }
+
+    contents.push({
+        role: 'user',
+        parts: newMessageParts
+    });
+
+    const result = await model.generateContent({ contents });
+    return result.response.text();
+
+  } catch (error) {
+    console.error("Error chatting with document using Gemini:", error);
     throw error;
   }
 };

@@ -2,7 +2,7 @@ import Document from '../models/Document.js';
 import fs from 'fs/promises'; // Use the modern, promise-based version of fs
 import path from 'path';     // Import the path module
 import { extractText } from '../utils/textExtractor.js';
-import { processDocumentWithGemini } from '../services/geminiService.js';
+import { processDocumentWithGemini, chatWithDocument } from '../services/geminiService.js';
 import Task from '../models/Task.js';
 import User from '../models/User.js';
 
@@ -304,5 +304,40 @@ export const archiveDocument = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+// ADD THIS ENTIRE NEW FUNCTION
+export const chatWithDoc = async (req, res) => {
+  try {
+    const document = await Document.findById(req.params.id);
+
+    if (!document) {
+      return res.status(404).json({ message: 'Document not found' });
+    }
+
+    // Security Check: Ensure the user owns the document or it's shared with them
+    const isOwner = document.user.toString() === req.user.id;
+    const isShared = document.sharedWith.some(id => id.toString() === req.user.id);
+
+    if (!isOwner && !isShared) {
+      return res.status(401).json({ message: 'User not authorized to access this document' });
+    }
+
+    const { message, history } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ message: 'Message is required' });
+    }
+
+    const fullPath = path.resolve(document.storagePath);
+    
+    const reply = await chatWithDocument(fullPath, 'application/pdf', history || [], message);
+
+    res.status(200).json({ reply });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error during chat' });
   }
 };

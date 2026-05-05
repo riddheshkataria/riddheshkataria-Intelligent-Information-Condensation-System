@@ -55,6 +55,16 @@ export const archiveDocument = async (documentId) => {
     return response.json();
 };
 
+export const chatWithDocument = async (documentId, history, message) => {
+    const response = await fetch(`${API_BASE_URL}/docs/${documentId}/chat`, {
+        method: 'POST',
+        headers: jsonAuthHeaders(),
+        body: JSON.stringify({ history, message }),
+    });
+    if (!response.ok) throw new Error('Failed to chat with document');
+    return response.json();
+};
+
 // --- Task APIs ---
 
 export const getTasks = async () => {
