@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { getDocuments, uploadDocument, getDocumentStatus } from '../services/api';
+import { getDocuments, uploadDocument, getDocumentStatus, archiveDocument, unarchiveDocument } from '../services/api';
 
 // Formats raw backend doc to the shape the UI expects
 const formatDoc = (doc) => ({
@@ -9,7 +9,7 @@ const formatDoc = (doc) => ({
     category: doc.documentType || 'Unclassified',
     time: new Date(doc.createdAt).toLocaleTimeString(),
     status: doc.status,
-    starred: false,
+    starred: doc.isArchived || false,
     view: 'recent',
     isArchived: doc.isArchived || false,
 });
@@ -67,11 +67,29 @@ export const useDocuments = () => {
         }
     }, [startPolling]);
 
-    const toggleStar = useCallback((docId) => {
+    const toggleStar = useCallback(async (docId) => {
+        const originalDoc = documents.find((d) => d.id === docId);
+        if (!originalDoc) return;
+
+        // Optimistically update
         setDocuments((prev) =>
-            prev.map((doc) => (doc.id === docId ? { ...doc, starred: !doc.starred } : doc))
+            prev.map((doc) => (doc.id === docId ? { ...doc, starred: !doc.starred, isArchived: !doc.isArchived } : doc))
         );
-    }, []);
+
+        try {
+            if (originalDoc.isArchived) {
+                await unarchiveDocument(docId);
+            } else {
+                await archiveDocument(docId);
+            }
+        } catch (err) {
+            console.error('Failed to toggle archive status:', err);
+            setDocuments((prev) =>
+                prev.map((doc) => (doc.id === docId ? { ...doc, starred: originalDoc.starred, isArchived: originalDoc.isArchived } : doc))
+            );
+            setError(err.message);
+        }
+    }, [documents]);
 
     const clearError = useCallback(() => setError(null), []);
 

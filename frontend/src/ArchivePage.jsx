@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import { ArchiveIcon, DatabaseIcon, SearchIcon, StarIcon, UploadIcon } from './components/icons/Icons';
@@ -39,6 +39,7 @@ const sidebarItems = [
 ];
 
 const ArchivePage = () => {
+    const navigate = useNavigate();
     const { documents: allDocuments, fetchDocuments, toggleStar } = useDocuments();
     const [isSidebarOpen, setSidebarOpen] = useState(false);
     const [viewMode, setViewMode] = useState('table');
@@ -52,7 +53,7 @@ const ArchivePage = () => {
     const documents = useMemo(() => allDocuments.filter(doc => doc.isArchived), [allDocuments]);
 
     const starredCount = useMemo(
-        () => documents.filter((doc) => doc.isStarred).length,
+        () => documents.filter((doc) => doc.starred).length,
         [documents]
     );
 
@@ -75,7 +76,7 @@ const ArchivePage = () => {
         }
 
         if (selectedCategory === 'starred') {
-            filtered = filtered.filter((doc) => doc.isStarred);
+            filtered = filtered.filter((doc) => doc.starred);
         } else if (selectedCategory !== 'all') {
             filtered = filtered.filter((doc) => doc.category === selectedCategory);
         }
@@ -85,10 +86,6 @@ const ArchivePage = () => {
 
     const toggleSidebar = () => {
         setSidebarOpen((previous) => !previous);
-    };
-
-    const handleStarToggle = (docId) => {
-        toggleStar(docId);
     };
 
     return (
@@ -217,19 +214,22 @@ const ArchivePage = () => {
                                 </thead>
                                 <tbody>
                                     {filteredDocuments.map((document) => (
-                                        <tr key={document.id}>
+                                        <tr key={document.id} onClick={() => navigate(`/document/${document.id}`)} style={{ cursor: 'pointer' }}>
                                             <td>
                                                 <button
                                                     type="button"
-                                                    className={`database-star-btn ${document.isStarred ? 'starred' : ''}`}
-                                                    onClick={() => handleStarToggle(document.id)}
+                                                    className={`database-star-btn ${document.starred ? 'starred' : ''}`}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        toggleStar(document.id);
+                                                    }}
                                                     aria-label={
-                                                        document.isStarred
+                                                        document.starred
                                                             ? 'Remove from starred'
                                                             : 'Add to starred'
                                                     }
                                                 >
-                                                    <StarIcon size={16} filled={document.isStarred} />
+                                                    <StarIcon size={16} filled={document.starred} />
                                                 </button>
                                             </td>
                                             <td className="database-table-title">{document.title}</td>
@@ -244,20 +244,23 @@ const ArchivePage = () => {
                     ) : (
                         <div className="database-card-grid">
                             {filteredDocuments.map((document) => (
-                                <article key={document.id} className="database-card">
+                                <article key={document.id} className="database-card" onClick={() => navigate(`/document/${document.id}`)} style={{ cursor: 'pointer' }}>
                                     <div className="database-card-head">
                                         <span>{document.category}</span>
                                         <button
                                             type="button"
-                                            className={`database-star-btn ${document.isStarred ? 'starred' : ''}`}
-                                            onClick={() => handleStarToggle(document.id)}
+                                            className={`database-star-btn ${document.starred ? 'starred' : ''}`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleStar(document.id);
+                                            }}
                                             aria-label={
-                                                document.isStarred
+                                                document.starred
                                                     ? 'Remove from starred'
                                                     : 'Add to starred'
                                             }
                                         >
-                                            <StarIcon size={16} filled={document.isStarred} />
+                                            <StarIcon size={16} filled={document.starred} />
                                         </button>
                                     </div>
                                     <h3>{document.title}</h3>

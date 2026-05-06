@@ -333,15 +333,42 @@ export const archiveDocument = async (req, res) => {
       return res.status(404).json({ message: 'Document not found' });
     }
 
-    // Security Check: Ensure the user owns the document
-    if (document.user.toString() !== req.user.id) {
+    // Security Check: Ensure the user owns the document or it's shared with them
+    const isOwner = document.user.toString() === req.user.id;
+    const isShared = document.sharedWith.some(id => id.toString() === req.user.id);
+
+    if (!isOwner && !isShared) {
       return res.status(401).json({ message: 'User not authorized to archive this document' });
     }
 
-    document.isArchived = true;
-    await document.save();
+    await Document.findByIdAndUpdate(req.params.id, { isArchived: true });
 
     res.status(200).json({ message: 'Document successfully archived' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+export const unarchiveDocument = async (req, res) => {
+  try {
+    const document = await Document.findById(req.params.id);
+
+    if (!document) {
+      return res.status(404).json({ message: 'Document not found' });
+    }
+
+    // Security Check: Ensure the user owns the document or it's shared with them
+    const isOwner = document.user.toString() === req.user.id;
+    const isShared = document.sharedWith.some(id => id.toString() === req.user.id);
+
+    if (!isOwner && !isShared) {
+      return res.status(401).json({ message: 'User not authorized to unarchive this document' });
+    }
+
+    await Document.findByIdAndUpdate(req.params.id, { isArchived: false });
+
+    res.status(200).json({ message: 'Document successfully unarchived' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });

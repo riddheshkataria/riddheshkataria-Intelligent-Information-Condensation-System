@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import { ArchiveIcon, ChevronLeftIcon } from './components/icons/Icons';
-import { getDocumentStatus } from './services/api.js';
+import { getDocumentStatus, archiveDocument, unarchiveDocument } from './services/api.js';
 import DocumentChat from './components/DocumentChat';
 import './DocumentView.css';
 
@@ -105,6 +105,22 @@ const DocumentView = () => {
         }
     };
 
+    const handleToggleArchive = async () => {
+        try {
+            if (document.isArchived) {
+                await unarchiveDocument(id);
+                setDocument((prev) => ({ ...prev, isArchived: false }));
+                alert('Document unarchived successfully!');
+            } else {
+                await archiveDocument(id);
+                setDocument((prev) => ({ ...prev, isArchived: true }));
+                alert('Document archived successfully!');
+            }
+        } catch (err) {
+            alert('Failed to update archive status: ' + err.message);
+        }
+    };
+
     const renderFeedbackState = (message) => (
         <div className="document-page">
             <Header />
@@ -181,17 +197,9 @@ const DocumentView = () => {
                             <button 
                                 type="button" 
                                 className="document-action-btn document-action-btn-secondary"
-                                onClick={async () => {
-                                    try {
-                                        const { archiveDocument } = await import('./services/api.js');
-                                        await archiveDocument(id);
-                                        alert('Document archived successfully!');
-                                    } catch (err) {
-                                        alert('Failed to archive document: ' + err.message);
-                                    }
-                                }}
+                                onClick={handleToggleArchive}
                             >
-                                <span>Archive</span>
+                                <span>{document.isArchived ? 'Unarchive' : 'Archive'}</span>
                                 <ArchiveIcon size={18} />
                             </button>
                         </div>

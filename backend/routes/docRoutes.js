@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import { protect } from '../middleware/authMiddleware.js';
-import { uploadDoc, getDocs, getDocById, searchDocs, shareDocument, getDocumentFile, archiveDocument, chatWithDoc } from '../controllers/docController.js'
+import { uploadDoc, getDocs, getDocById, searchDocs, shareDocument, getDocumentFile, archiveDocument, unarchiveDocument, chatWithDoc } from '../controllers/docController.js'
 
 const router = express.Router();
 
@@ -35,6 +35,12 @@ router.post('/:id/share', protect, shareDocument);
 // @desc    Archive a document
 // @access  Private (Owner only)
 router.post('/:id/archive', protect, archiveDocument);
+
+// ADD THIS NEW ROUTE
+// @route   POST /api/docs/:id/unarchive
+// @desc    Unarchive a document
+// @access  Private
+router.post('/:id/unarchive', protect, unarchiveDocument);
 // Route for getting the status/details of a single document
 // GET /api/docs/status/:id
 router.get('/status/:id', protect, getDocById);

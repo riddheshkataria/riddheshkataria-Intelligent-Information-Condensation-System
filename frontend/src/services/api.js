@@ -59,7 +59,22 @@ export const archiveDocument = async (documentId) => {
         method: 'POST',
         headers: authHeaders(),
     });
-    if (!response.ok) throw new Error('Failed to archive document');
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to archive document');
+    }
+    return response.json();
+};
+
+export const unarchiveDocument = async (documentId) => {
+    const response = await fetch(`${API_BASE_URL}/docs/${documentId}/unarchive`, {
+        method: 'POST',
+        headers: authHeaders(),
+    });
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to unarchive document');
+    }
     return response.json();
 };
 
