@@ -370,6 +370,11 @@ export const chatWithDoc = async (req, res) => {
     // Call the new chat service that takes relevant chunks instead of the full file
     const reply = await chatWithDocument(relevantChunks, history || [], message);
 
+    // Save chat to database
+    document.chatHistory.push({ role: 'user', text: message });
+    document.chatHistory.push({ role: 'model', text: reply });
+    await document.save();
+
     res.status(200).json({ reply });
 
   } catch (error) {

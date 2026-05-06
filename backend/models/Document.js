@@ -64,6 +64,11 @@ const documentSchema = new mongoose.Schema(
       text: String,
       embedding: [Number]
     }],
+    chatHistory: [{
+      role: String,
+      text: String,
+      timestamp: { type: Date, default: Date.now }
+    }],
     isArchived: {
       type: Boolean,
       default: false,

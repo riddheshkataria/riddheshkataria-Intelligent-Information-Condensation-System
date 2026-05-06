@@ -16,10 +16,14 @@ const SendIcon = () => (
     </svg>
 );
 
-const DocumentChat = ({ documentId }) => {
-    const [messages, setMessages] = useState([
-        { role: 'model', text: 'Hi! Ask me anything about this document.' }
-    ]);
+const DocumentChat = ({ documentId, initialChatHistory }) => {
+    const [messages, setMessages] = useState(() => {
+        const defaultGreeting = { role: 'model', text: 'Hi! Ask me anything about this document.' };
+        if (initialChatHistory && initialChatHistory.length > 0) {
+            return [defaultGreeting, ...initialChatHistory];
+        }
+        return [defaultGreeting];
+    });
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef(null);

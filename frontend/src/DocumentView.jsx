@@ -226,7 +226,7 @@ const DocumentView = () => {
                 </section>
 
                 <section className="document-chat-section">
-                    <DocumentChat documentId={id} />
+                    <DocumentChat documentId={id} initialChatHistory={document.chatHistory} />
                 </section>
             </main>
 
