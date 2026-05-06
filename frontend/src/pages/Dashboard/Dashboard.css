@@ -1137,7 +1137,8 @@ a.document-link {
         grid-template-columns: 2fr 1fr 1fr 0.5fr;
     }
 
-    .task-row .task-docs {
+    .todo-grid-header > *:nth-child(4),
+    .task-row > *:nth-child(4) {
         display: none;
     }
 
@@ -1160,8 +1161,8 @@ a.document-link {
     
     .todo-grid-header > *:nth-child(2),
     .todo-grid-header > *:nth-child(3),
-    .task-row .task-deadline,
-    .task-row .task-overdue {
+    .task-row > *:nth-child(2),
+    .task-row > *:nth-child(3) {
         display: none;
     }
 
