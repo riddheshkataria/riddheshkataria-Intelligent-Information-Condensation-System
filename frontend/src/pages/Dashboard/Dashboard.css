@@ -1151,4 +1151,34 @@ a.document-link {
     }
 }
 
+@media (max-width: 480px) {
+    .todo-grid-header,
+    .task-row {
+        grid-template-columns: 1fr 0.5fr;
+        gap: 0.5rem;
+    }
+    
+    .todo-grid-header > *:nth-child(2),
+    .todo-grid-header > *:nth-child(3),
+    .task-row .task-deadline,
+    .task-row .task-overdue {
+        display: none;
+    }
+
+    .doc-list-header,
+    .doc-list li {
+        grid-template-columns: 40px 1fr 40px;
+    }
+    .doc-list-header > *:nth-child(3),
+    .doc-list-header > *:nth-child(4),
+    .doc-list li > *:nth-child(3),
+    .doc-list li > *:nth-child(4) {
+        display: none;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
 

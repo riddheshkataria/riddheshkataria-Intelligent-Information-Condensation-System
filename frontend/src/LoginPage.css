@@ -337,3 +337,15 @@
     transform: none;
   }
 }
+
+@media (max-width: 480px) {
+  .login-intro-card h1 {
+    font-size: 1.6rem;
+  }
+  .login-title {
+    font-size: 1.25rem;
+  }
+  .intro-points article {
+    padding: 0.75rem;
+  }
+}

@@ -207,3 +207,41 @@
 .upload-btn:not(:disabled):hover {
   background-color: #00796b;
 }
+
+/* --- Responsive Design for Upload --- */
+@media (max-width: 768px) {
+  .upload-popup {
+    padding: 20px 24px 24px;
+    width: 95vw;
+  }
+  .upload-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  .upload-dropzone {
+    padding: 24px 16px;
+  }
+  .upload-icon {
+    font-size: 30px;
+  }
+  .upload-btn {
+    font-size: 15px;
+    padding: 8px 14px;
+  }
+}
+@media (max-width: 480px) {
+  .upload-popup {
+    padding: 16px 20px 20px;
+  }
+  .upload-title {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+  .upload-dropzone {
+    padding: 20px 12px;
+  }
+  .source-btn {
+    padding: 5px 12px;
+    font-size: 12px;
+  }
+}

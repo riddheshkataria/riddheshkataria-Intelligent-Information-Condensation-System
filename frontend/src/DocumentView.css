@@ -308,3 +308,19 @@
         width: 100%;
     }
 }
+
+@media (max-width: 480px) {
+    .document-overview-panel {
+        padding: 1rem;
+    }
+    .document-overview-copy h1 {
+        font-size: 1.3rem;
+    }
+    .document-summary-card,
+    .document-access-card {
+        padding: 0.8rem;
+    }
+    .document-action-row {
+        gap: 0.5rem;
+    }
+}

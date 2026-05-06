@@ -214,3 +214,16 @@
         font-size: 1.55rem;
     }
 }
+
+@media (max-width: 480px) {
+    .profile-overview-panel {
+        padding: 1rem;
+    }
+    .profile-overview-copy h1 {
+        font-size: 1.3rem;
+    }
+    .profile-details-card,
+    .profile-access-card {
+        padding: 0.8rem;
+    }
+}

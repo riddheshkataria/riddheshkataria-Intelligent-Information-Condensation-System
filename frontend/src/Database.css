@@ -540,3 +540,33 @@
         justify-content: space-between;
     }
 }
+
+@media (max-width: 480px) {
+    .database-overview-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .database-toolbar-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .database-category-filter {
+        width: 100%;
+    }
+    
+    .database-view-toggle {
+        justify-content: center;
+    }
+
+    .database-pagination-controls {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    .database-pagination-controls span {
+        width: 100%;
+    }
+}

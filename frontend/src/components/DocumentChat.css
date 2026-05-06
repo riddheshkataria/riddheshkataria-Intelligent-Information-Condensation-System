@@ -174,3 +174,43 @@
     background-color: var(--border-color);
     border-radius: 10px;
 }
+
+/* --- Responsive Design for Document Chat --- */
+@media (max-width: 768px) {
+    .document-chat-container {
+        height: 400px;
+        margin-top: 1.5rem;
+    }
+    .document-chat-header {
+        padding: 0.75rem 1rem;
+    }
+    .document-chat-messages {
+        padding: 1rem;
+    }
+    .chat-message {
+        max-width: 90%;
+        padding: 0.75rem 1rem;
+    }
+    .document-chat-input-area {
+        padding: 0.75rem 1rem;
+    }
+    .document-chat-form input {
+        padding: 0.6rem 0.8rem;
+    }
+    .document-chat-form button {
+        padding: 0.6rem 1rem;
+    }
+}
+@media (max-width: 480px) {
+    .document-chat-container {
+        height: 350px;
+    }
+    .chat-message {
+        max-width: 95%;
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    .document-chat-form {
+        gap: 0.5rem;
+    }
+}

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { ProfileIcon, SearchIcon } from '../icons/Icons';
 import { searchDocuments, searchTasks } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import './Header.css';
 
 const Header = memo(() => {
@@ -9,10 +10,13 @@ const Header = memo(() => {
     const [docResults, setDocResults] = useState([]);
     const [taskResults, setTaskResults] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
+    const [isNavOpen, setIsNavOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const wrapperRef = useRef(null);
     const debounceRef = useRef(null);
     const navigate = useNavigate();
+    const location = useLocation();
+    const { logout } = useAuth();
 
     // Debounced search — searches both documents and tasks
     const handleSearch = useCallback((value) => {
@@ -77,13 +81,47 @@ const Header = memo(() => {
         }
     };
 
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
     const hasResults = docResults.length > 0 || taskResults.length > 0;
 
     return (
         <header className="dashboard-header">
-            <div className="logo">
-                <span className="logo-text">IICS</span>
+            <div className="header-left">
+                <button 
+                    className="mobile-nav-toggle" 
+                    onClick={() => setIsNavOpen(!isNavOpen)}
+                    aria-label="Toggle navigation"
+                >
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                        {isNavOpen ? (
+                            <>
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </>
+                        ) : (
+                            <>
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                            </>
+                        )}
+                    </svg>
+                </button>
+                <div className="logo">
+                    <span className="logo-text">IICS</span>
+                </div>
+                
+                <nav className={`header-nav ${isNavOpen ? 'open' : ''}`}>
+                    <NavLink to="/dashboard" onClick={() => setIsNavOpen(false)} className={({ isActive }) => `nav-tab ${isActive ? 'active' : ''}`}>Home</NavLink>
+                    <NavLink to="/database" onClick={() => setIsNavOpen(false)} className={({ isActive }) => `nav-tab ${isActive ? 'active' : ''}`}>Database</NavLink>
+                    <NavLink to="/archive" onClick={() => setIsNavOpen(false)} className={({ isActive }) => `nav-tab ${isActive ? 'active' : ''}`}>Archives</NavLink>
+                </nav>
             </div>
+
             <div className="search-bar" ref={wrapperRef}>
                 <SearchIcon />
                 <input
@@ -165,6 +203,9 @@ const Header = memo(() => {
                 <Link to="/profile" className="profile-button" aria-label="Profile">
                     <ProfileIcon />
                 </Link>
+                <button onClick={handleLogout} className="logout-button" aria-label="Logout">
+                    Logout
+                </button>
             </div>
         </header>
     );

@@ -590,6 +590,25 @@
   }
 }
 
+@media (max-width: 480px) {
+  .hero-copy h1 {
+    font-size: 1.8rem;
+  }
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn {
+    width: 100%;
+  }
+  .story-copy {
+    padding: 1rem;
+  }
+  .final-cta-content h2 {
+    font-size: 1.25rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .btn,
   .social-icons a {
