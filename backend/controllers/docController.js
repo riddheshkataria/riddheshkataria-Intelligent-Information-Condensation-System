@@ -3,6 +3,7 @@ import fs from 'fs/promises'; // Use the modern, promise-based version of fs
 import path from 'path';     // Import the path module
 import { extractText } from '../utils/textExtractor.js';
 import { processDocumentWithGemini, chatWithDocument, generateEmbedding, generateEmbeddingsBatch } from '../services/geminiService.js';
+import { uploadToCloudinary } from '../config/cloudinary.js';
 import Task from '../models/Task.js';
 import User from '../models/User.js';
 import { chunkText } from '../utils/chunker.js';
@@ -22,7 +23,7 @@ export const uploadDoc = async (req, res) => {
     const newDoc = new Document({
       user: req.user.id,
       originalFilename: req.file.originalname,
-      storagePath: req.file.path,
+      fileUrl: req.file.path, // Temporarily store local path, will be updated to Cloudinary URL
       status: 'processing',
       // Add the new fields here
       pastedText: pastedText || '',
@@ -70,11 +71,25 @@ const processDocument = async (docId, filePath) => {
     const documentChunks = await generateEmbeddingsBatch(chunks);
     console.log(`Generated embeddings for ${documentChunks.length} chunks.`);
 
+    // --- NEW: Upload to Cloudinary and cleanup local file ---
+    console.log(`Uploading document ${docId} to Cloudinary...`);
+    const cloudinaryUrl = await uploadToCloudinary(filePath);
+    console.log(`Uploaded to Cloudinary: ${cloudinaryUrl}`);
+    
+    // Delete local file
+    try {
+      await fs.unlink(filePath);
+      console.log(`Deleted local file: ${filePath}`);
+    } catch (cleanupError) {
+      console.error(`Failed to delete local file ${filePath}:`, cleanupError);
+    }
+
     // Step D: Update the document in the DB with all the new, real data
     const updatedDoc = await Document.findByIdAndUpdate(
       docId,
       {
         status: 'completed',
+        fileUrl: cloudinaryUrl, // Save Cloudinary URL
         fullText: fullText, // Optionally save the full text
         summary: summary || 'No summary available.',
         entities: entities || [],
@@ -154,9 +169,35 @@ export const searchDocs = async (req, res) => {
     if (!query) {
       return res.status(400).json({ error: 'Search query is required.' });
     }
-    const docs = await Document.find({ $text: { $search: query } });
+
+    const regex = new RegExp(query, 'i');
+
+    const docs = await Document.find({
+      // Only show docs the user owns or has access to
+      $and: [
+        {
+          $or: [
+            { user: req.user.id },
+            { sharedWith: req.user.id }
+          ]
+        },
+        {
+          $or: [
+            { originalFilename: regex },
+            { summary: regex },
+            { documentType: regex },
+            { tags: regex },
+          ]
+        }
+      ]
+    })
+    .select('originalFilename summary documentType status createdAt')
+    .sort({ updatedAt: -1 })
+    .limit(10);
+
     res.status(200).json(docs);
   } catch (error) {
+    console.error('Search error:', error);
     res.status(500).json({ error: 'Server error.' });
   }
 };
@@ -270,23 +311,11 @@ export const getDocumentFile = async (req, res) => {
       return res.status(401).json({ message: 'User not authorized to access this file' });
     }
 
-    // This sends the file from the path stored in the database
-    const fullPath = path.resolve(document.storagePath);
-    
-    try {
-      // Check if the file actually exists on the filesystem
-      await fs.access(fullPath);
-      res.sendFile(fullPath, (err) => {
-        if (err) {
-          console.error('Error sending file:', err);
-          if (!res.headersSent) {
-            res.status(500).json({ message: 'Error sending file' });
-          }
-        }
-      });
-    } catch (fsError) {
-      console.error('File missing on disk:', fullPath);
-      return res.status(404).json({ message: 'The requested document file no longer exists on the server.' });
+    // Return the Cloudinary URL
+    if (document.fileUrl && document.fileUrl.startsWith('http')) {
+      return res.status(200).json({ fileUrl: document.fileUrl });
+    } else {
+      return res.status(404).json({ message: 'File URL not valid or still processing.' });
     }
 
   } catch (error) {

@@ -93,9 +93,12 @@ const DocumentView = () => {
                 throw new Error('Failed to fetch original document.');
             }
 
-            const blob = await response.blob();
-            const fileObjectUrl = window.URL.createObjectURL(blob);
-            window.open(fileObjectUrl, '_blank');
+            const data = await response.json();
+            if (data.fileUrl) {
+                window.open(data.fileUrl, '_blank');
+            } else {
+                throw new Error('File URL not found in response.');
+            }
         } catch (fetchError) {
             console.error('Failed to fetch document file:', fetchError);
             setError('Could not open document.');

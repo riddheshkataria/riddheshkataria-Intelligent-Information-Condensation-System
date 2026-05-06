@@ -22,6 +22,14 @@ export const getDocuments = async (limit = 0) => {
     return response.json();
 };
 
+export const searchDocuments = async (query) => {
+    const response = await fetch(`${API_BASE_URL}/docs/search?q=${encodeURIComponent(query)}`, {
+        headers: authHeaders(),
+    });
+    if (!response.ok) throw new Error('Search failed');
+    return response.json();
+};
+
 export const uploadDocument = async (file, additionalData) => {
     const formData = new FormData();
     formData.append('file', file);
@@ -72,6 +80,14 @@ export const getTasks = async () => {
         headers: authHeaders(),
     });
     if (!response.ok) throw new Error('Failed to fetch tasks');
+    return response.json();
+};
+
+export const searchTasks = async (query) => {
+    const response = await fetch(`${API_BASE_URL}/tasks/search?q=${encodeURIComponent(query)}`, {
+        headers: authHeaders(),
+    });
+    if (!response.ok) throw new Error('Task search failed');
     return response.json();
 };
 

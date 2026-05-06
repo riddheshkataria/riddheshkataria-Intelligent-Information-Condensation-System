@@ -6,8 +6,8 @@ const documentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // The path where the file is stored (e.g., 'uploads/12345.pdf')
-    storagePath: {
+    // The URL where the file is stored in Cloudinary
+    fileUrl: {
       type: String,
       required: true,
     },

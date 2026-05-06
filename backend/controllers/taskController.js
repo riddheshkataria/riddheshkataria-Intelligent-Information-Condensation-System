@@ -108,3 +108,33 @@ export const deleteTask = async (req, res) => {
     res.status(500).json({ message: 'Server Error' });
   }
 };
+
+// @desc    Search tasks for the logged-in user
+// @route   GET /api/tasks/search?q=...
+// @access  Private
+export const searchTasks = async (req, res) => {
+  try {
+    const query = req.query.q;
+    if (!query) {
+      return res.status(400).json({ message: 'Search query is required.' });
+    }
+
+    const regex = new RegExp(query, 'i');
+
+    const tasks = await Task.find({
+      assignedTo: req.user.id,
+      $or: [
+        { title: regex },
+        { description: regex },
+      ]
+    })
+    .populate('relatedDocument', 'originalFilename')
+    .sort({ createdAt: -1 })
+    .limit(10);
+
+    res.status(200).json(tasks);
+  } catch (error) {
+    console.error('Error searching tasks:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};

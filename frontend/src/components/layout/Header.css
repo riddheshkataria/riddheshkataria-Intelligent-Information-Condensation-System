@@ -48,11 +48,12 @@
     align-items: center;
 }
 
-.search-bar svg {
+.search-bar > svg {
     position: absolute;
     left: 1rem;
     color: var(--text-muted);
     pointer-events: none;
+    z-index: 1;
 }
 
 .search-bar input {
@@ -77,36 +78,196 @@
     box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
+/* --- Search Results Dropdown --- */
+.search-results-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: rgba(15, 23, 42, 0.98);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    max-height: 360px;
+    overflow-y: auto;
+    z-index: 200;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    animation: searchDropIn 0.18s ease-out;
+}
+
+@keyframes searchDropIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.search-result-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    padding: 0.65rem 1rem;
+    background: none;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    font-family: inherit;
+    font-size: 0.875rem;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item:hover {
+    background: rgba(20, 184, 166, 0.08);
+}
+
+.search-result-icon {
+    margin-right: 6px;
+    font-size: 0.85rem;
+}
+
+.search-result-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.search-result-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+}
+
+/* --- Section Labels --- */
+.search-section {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.search-section:last-child {
+    border-bottom: none;
+}
+
+.search-section-label {
+    padding: 0.5rem 1rem 0.25rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    pointer-events: none;
+}
+
+.search-result-type {
+    color: var(--text-muted);
+}
+
+.search-result-status {
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.search-result-status[data-status="completed"] {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+}
+
+.search-result-status[data-status="processing"] {
+    background: rgba(234, 179, 8, 0.15);
+    color: #eab308;
+}
+
+.search-result-status[data-status="failed"] {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.search-result-status[data-status="pending"] {
+    background: rgba(234, 179, 8, 0.15);
+    color: #eab308;
+}
+
+.search-result-status[data-status="in-progress"] {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+.search-result-urgency {
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.search-result-urgency[data-urgency="High"] {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.search-result-urgency[data-urgency="Medium"] {
+    background: rgba(234, 179, 8, 0.15);
+    color: #eab308;
+}
+
+.search-result-urgency[data-urgency="Low"] {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+}
+
+.search-loading,
+.search-empty {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem 1rem;
+    color: var(--text-muted);
+    cursor: default;
+    font-size: 0.85rem;
+}
+
+.search-loading:hover,
+.search-empty:hover {
+    background: none;
+}
+
+.search-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(20, 184, 166, 0.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- Header Controls --- */
 .header-controls {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-}
-
-.language-toggle {
-    background: var(--bg-secondary);
-    color: var(--text-secondary);
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 9999px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.82rem;
-    transition: var(--transition);
-    font-family: inherit;
-}
-
-.language-toggle svg {
-    width: 14px;
-    height: 14px;
-}
-
-.language-toggle:hover {
-    border-color: var(--accent);
-    color: var(--text-primary);
 }
 
 .profile-button {

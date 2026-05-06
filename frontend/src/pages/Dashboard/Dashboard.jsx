@@ -83,8 +83,13 @@ function Dashboard() {
         const fileUrl = `http://localhost:5000/api/docs/file/${documentId}`;
 
         fetch(fileUrl, { headers: { Authorization: `Bearer ${token}` } })
-            .then((res) => res.blob())
-            .then((blob) => window.open(window.URL.createObjectURL(blob)))
+            .then(async (res) => {
+                if (!res.ok) throw new Error('Failed to fetch');
+                return res.json();
+            })
+            .then((data) => {
+                if (data.fileUrl) window.open(data.fileUrl, '_blank');
+            })
             .catch((err) => console.error('Failed to fetch document file:', err));
     }, []);
 
