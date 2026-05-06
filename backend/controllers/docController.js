@@ -2,9 +2,11 @@ import Document from '../models/Document.js';
 import fs from 'fs/promises'; // Use the modern, promise-based version of fs
 import path from 'path';     // Import the path module
 import { extractText } from '../utils/textExtractor.js';
-import { processDocumentWithGemini, chatWithDocument } from '../services/geminiService.js';
+import { processDocumentWithGemini, chatWithDocument, generateEmbedding, generateEmbeddingsBatch } from '../services/geminiService.js';
 import Task from '../models/Task.js';
 import User from '../models/User.js';
+import { chunkText } from '../utils/chunker.js';
+import { findTopKSimilar } from '../utils/vectorSearch.js';
 
 // This is the main function that handles the file upload and triggers background processing.
 export const uploadDoc = async (req, res) => {
@@ -60,11 +62,20 @@ const processDocument = async (docId, filePath) => {
       names
     } = mlResult;
 
+    // --- NEW RAG STEP: Extract text, chunk, and embed ---
+    console.log(`Starting RAG processing for document ${docId}...`);
+    const fullText = await extractText(filePath);
+    const chunks = chunkText(fullText, 1000, 200);
+    console.log(`Extracted ${chunks.length} chunks. Generating embeddings...`);
+    const documentChunks = await generateEmbeddingsBatch(chunks);
+    console.log(`Generated embeddings for ${documentChunks.length} chunks.`);
+
     // Step D: Update the document in the DB with all the new, real data
     const updatedDoc = await Document.findByIdAndUpdate(
       docId,
       {
         status: 'completed',
+        fullText: fullText, // Optionally save the full text
         summary: summary || 'No summary available.',
         entities: entities || [],
         // Use the 'categories' from the response as our 'documentType'
@@ -72,6 +83,7 @@ const processDocument = async (docId, filePath) => {
         tags: tags || [],
         importantDates: important_dates || [],
         people: names || [],
+        documentChunks: documentChunks // Save chunks and embeddings
       },
       { new: true } // This option returns the updated document
     );
@@ -330,9 +342,33 @@ export const chatWithDoc = async (req, res) => {
       return res.status(400).json({ message: 'Message is required' });
     }
 
-    const fullPath = path.resolve(document.storagePath);
+    let relevantChunks = [];
     
-    const reply = await chatWithDocument(fullPath, 'application/pdf', history || [], message);
+    // Check if we have pre-computed chunks and embeddings for this document
+    if (document.documentChunks && document.documentChunks.length > 0) {
+        console.log(`[RAG] Finding relevant chunks for document ${document._id}...`);
+        // 1. Generate embedding for the user's question
+        const queryEmbedding = await generateEmbedding(message);
+        
+        // 2. Perform vector search to find top K chunks
+        const topK = 5; // Find top 5 chunks
+        const similarChunks = findTopKSimilar(queryEmbedding, document.documentChunks, topK);
+        
+        relevantChunks = similarChunks.map(sc => ({ text: sc.text }));
+        console.log(`[RAG] Selected ${relevantChunks.length} chunks. Top score: ${similarChunks[0]?.score}`);
+    } else {
+        console.warn(`[RAG] Document ${document._id} does not have documentChunks. Using empty context (or fallback).`);
+        // Fallback: we could pass the entire fullText here if we want, but chunks are expected
+        // We'll pass an empty array, and the LLM will just answer based on history or nothing.
+        // If we wanted to fallback to full document, we'd have to re-read the file.
+        // For now, let's fallback to the fullText if available, chunked loosely.
+        if (document.fullText) {
+             relevantChunks = [{ text: document.fullText.substring(0, 15000) }]; // limit fallback
+        }
+    }
+
+    // Call the new chat service that takes relevant chunks instead of the full file
+    const reply = await chatWithDocument(relevantChunks, history || [], message);
 
     res.status(200).json({ reply });
 

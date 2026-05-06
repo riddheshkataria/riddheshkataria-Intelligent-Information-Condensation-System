@@ -60,6 +60,10 @@ const documentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     }],
+    documentChunks: [{
+      text: String,
+      embedding: [Number]
+    }],
     isArchived: {
       type: Boolean,
       default: false,

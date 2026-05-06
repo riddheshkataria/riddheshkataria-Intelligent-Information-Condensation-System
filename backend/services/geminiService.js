@@ -69,7 +69,7 @@ export const processDocumentWithGemini = async (filePath, mimeType = 'applicatio
   }
 };
 
-export const chatWithDocument = async (filePath, mimeType = 'application/pdf', history = [], message) => {
+export const chatWithDocument = async (relevantChunks, history = [], message) => {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY is missing in environment variables.");
@@ -80,15 +80,9 @@ export const chatWithDocument = async (filePath, mimeType = 'application/pdf', h
   const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
 
   try {
-    const fileBuffer = await fs.readFile(filePath);
+    // Combine relevant chunks into a single context string
+    const documentContext = relevantChunks.map((chunk, index) => `--- Chunk ${index + 1} ---\n${chunk.text}\n`).join('\n');
     
-    const filePart = {
-      inlineData: {
-        data: fileBuffer.toString("base64"),
-        mimeType
-      }
-    };
-
     // Construct the contents array for the chat history
     const contents = [];
     
@@ -96,10 +90,9 @@ export const chatWithDocument = async (filePath, mimeType = 'application/pdf', h
         const item = history[i];
         const parts = [{ text: item.text }];
         
-        // Inject the document into the very first user message of the conversation
+        // Inject the document chunks into the very first user message of the conversation
         if (i === 0 && item.role === 'user') {
-            parts.unshift(filePart);
-            parts[1].text = `Document Context:\n(Attached File)\n\nUser Question:\n${item.text}`;
+            parts[0].text = `Document Context:\n${documentContext}\n\nUser Question:\n${item.text}`;
         }
         
         contents.push({
@@ -113,8 +106,7 @@ export const chatWithDocument = async (filePath, mimeType = 'application/pdf', h
     
     // If history was empty, this new message is the first message
     if (history.length === 0) {
-        newMessageParts.unshift(filePart);
-        newMessageParts[1].text = `You are a helpful AI assistant. Answer the user's questions based primarily on the attached document. If the document does not contain the answer, say so.\n\nUser Question:\n${message}`;
+        newMessageParts[0].text = `You are a helpful AI assistant. Answer the user's questions based primarily on the provided document context chunks. If the document chunks do not contain the answer, say so.\n\nDocument Context:\n${documentContext}\n\nUser Question:\n${message}`;
     }
 
     contents.push({
@@ -129,4 +121,49 @@ export const chatWithDocument = async (filePath, mimeType = 'application/pdf', h
     console.error("Error chatting with document using Gemini:", error);
     throw error;
   }
+};
+
+export const generateEmbedding = async (text) => {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is missing in environment variables.");
+  }
+  const genAI = new GoogleGenerativeAI(apiKey);
+  // Note: For embeddings, we use the embedding model
+  const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
+  
+  const result = await model.embedContent(text);
+  return result.embedding.values;
+};
+
+export const generateEmbeddingsBatch = async (chunks) => {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is missing in environment variables.");
+  }
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
+  
+  // Create requests for each chunk
+  // Rate limiting might apply if there are many chunks, 
+  // so we might want to do them in small batches, but for simplicity we'll Promise.all
+  // Alternatively, we can use the batchEmbedContents API if supported by the SDK,
+  // but doing them one by one concurrently is usually fine for small docs.
+  
+  const embeddings = [];
+  for (let i = 0; i < chunks.length; i++) {
+    try {
+      const result = await model.embedContent(chunks[i]);
+      embeddings.push({
+        text: chunks[i],
+        embedding: result.embedding.values
+      });
+      // A small delay to avoid rate limits
+      await new Promise(r => setTimeout(r, 100));
+    } catch (e) {
+      console.error(`Failed to embed chunk ${i}`, e);
+    }
+  }
+  
+  return embeddings;
 };
