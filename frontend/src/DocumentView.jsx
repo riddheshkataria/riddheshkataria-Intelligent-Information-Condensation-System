@@ -82,7 +82,7 @@ const DocumentView = () => {
 
     const handleFetchOriginal = async () => {
         const token = localStorage.getItem('userToken');
-        const fileUrl = `http://localhost:5000/api/docs/file/${id}`;
+        const fileUrl = `http://localhost:8000/api/docs/file/${id}`;
 
         try {
             const response = await fetch(fileUrl, {

@@ -80,7 +80,7 @@ function Dashboard() {
             return;
         }
         const token = localStorage.getItem('userToken');
-        const fileUrl = `http://localhost:5000/api/docs/file/${documentId}`;
+        const fileUrl = `http://localhost:8000/api/docs/file/${documentId}`;
 
         fetch(fileUrl, { headers: { Authorization: `Bearer ${token}` } })
             .then(async (res) => {

@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import { ArchiveIcon, DatabaseIcon, SearchIcon, StarIcon, UploadIcon } from './components/icons/Icons';
 import databaseStyles from './Database.css?raw';
+import { useDocuments } from './hooks/useDocuments';
 
 const MenuIcon = () => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -30,34 +31,6 @@ const GridIcon = () => (
     </svg>
 );
 
-const initialMockData = [
-    { id: 1, title: 'Rolling Stock Maintenance SOP', description: 'Standard operating procedures for daily train maintenance and checks.', category: 'Operations & Maintenance', time: '9:15 AM', isStarred: false },
-    { id: 2, title: 'Station Staffing Roster Q4', description: 'Weekly duty roster for all customer service and station staff for the fourth quarter.', category: 'Operations & Maintenance', time: '8:30 AM', isStarred: false },
-    { id: 3, title: 'Track Inspection Report - Sept', description: 'Monthly inspection report for the main line tracks and signalling.', category: 'Operations & Maintenance', time: 'Yesterday', isStarred: true },
-    { id: 4, title: 'Q3 Financial Statement', description: 'Quarterly financial statements and corporate performance review.', category: 'Finance', time: '10:02 AM', isStarred: true },
-    { id: 5, title: 'Annual Budget Proposal 2026', description: 'The proposed budget allocation for all departments for the upcoming fiscal year.', category: 'Finance', time: '2:10 PM', isStarred: false },
-    { id: 6, title: 'Vendor Payment Records', description: 'Ledger of all payments made to approved vendors in Q3.', category: 'Finance', time: '4 Days Ago', isStarred: false },
-    { id: 7, title: 'Employee Onboarding Manual', description: 'A comprehensive handbook for new hires detailing all company policies.', category: 'Human Resources', time: '11:30 AM', isStarred: false },
-    { id: 8, title: 'Recruitment Drive Plan - Technicians', description: 'Strategy and planning document for hiring new train operators and technicians.', category: 'Human Resources', time: '12:00 PM', isStarred: false },
-    { id: 9, title: 'Performance Review Guidelines', description: 'SOP for conducting annual employee performance reviews.', category: 'Human Resources', time: '2 Weeks Ago', isStarred: false },
-    { id: 10, title: 'New Line Extension Blueprint', description: 'Technical drawings and project plan for the Phase 2 extension.', category: 'Projects & Planning', time: '1:45 PM', isStarred: false },
-    { id: 11, title: 'Signalling System Spec Sheet', description: 'Technical specifications for the new CBTC signalling system tender.', category: 'Projects & Planning', time: 'Yesterday', isStarred: true },
-    { id: 12, title: 'Platform Safety Audit - Oct 2025', description: 'Monthly safety and security inspection report for all metro stations.', category: 'Safety & Security', time: '3:20 PM', isStarred: true },
-    { id: 13, title: 'CCTV Footage Access Policy', description: 'Rules and regulations for requesting and accessing security camera footage.', category: 'Safety & Security', time: 'Yesterday', isStarred: false },
-    { id: 14, title: 'Emergency Evacuation Drill Report', description: 'Post-action report from the latest system-wide emergency drill.', category: 'Safety & Security', time: 'Last Week', isStarred: false },
-    { id: 15, title: 'IT Server Infrastructure Upgrade', description: 'Detailed plan and budget for the upcoming server hardware replacement.', category: 'Information Technology', time: '4:55 PM', isStarred: false },
-    { id: 16, title: 'Ticketing System API Docs', description: 'Technical documentation for the automated fare collection (AFC) system API.', category: 'Information Technology', time: 'Yesterday', isStarred: false },
-    { id: 17, title: 'Cybersecurity Policy v3.1', description: 'Updated company-wide policy on data security and acceptable use.', category: 'Information Technology', time: '3 Days Ago', isStarred: true },
-    { id: 18, title: 'Land Acquisition Contract - Phase 2', description: 'Legal contracts pertaining to land acquisition for the new line.', category: 'Legal', time: '1 Week Ago', isStarred: false },
-    { id: 19, title: 'Regulatory Compliance Checklist', description: 'Checklist of all national and state transport regulations.', category: 'Legal', time: '5 Days Ago', isStarred: false },
-    { id: 20, title: 'Press Release - New Smart Card', description: 'Official press release document for the launch of the new smart card.', category: 'Marketing & PR', time: '10:00 AM', isStarred: false },
-    { id: 21, title: 'Social Media Content Calendar', description: 'Monthly schedule for posts on all social media platforms.', category: 'Marketing & PR', time: 'Yesterday', isStarred: false },
-    { id: 22, title: 'Tender Document - Station Cleaning Services', description: 'Request for Proposal (RFP) for station housekeeping and cleaning.', category: 'Procurement', time: '2 Days Ago', isStarred: false },
-    { id: 23, title: 'Vendor Onboarding SOP', description: 'Standard procedure for registering new suppliers and vendors.', category: 'Procurement', time: 'Last Month', isStarred: false },
-    { id: 24, title: 'Monthly Feedback Analysis Report', description: 'Analysis of customer feedback collected from all channels in September.', category: 'Customer Relations', time: '3 Days Ago', isStarred: false },
-    { id: 25, title: 'Complaint Resolution SOP', description: 'Step-by-step guide for customer service agents on handling complaints.', category: 'Customer Relations', time: '2 Weeks Ago', isStarred: true },
-];
-
 const sidebarItems = [
     { label: 'Database', icon: DatabaseIcon, active: true },
     { label: 'Starred', icon: StarIcon, active: false },
@@ -68,15 +41,20 @@ const sidebarItems = [
 const ITEMS_PER_PAGE = 9;
 
 const DatabasePage = () => {
+    const navigate = useNavigate();
+    const { documents, fetchDocuments, toggleStar, loading, error } = useDocuments();
     const [isSidebarOpen, setSidebarOpen] = useState(false);
     const [viewMode, setViewMode] = useState('table');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
-    const [documents, setDocuments] = useState(initialMockData);
     const [currentPage, setCurrentPage] = useState(1);
 
+    useEffect(() => {
+        fetchDocuments(0);
+    }, [fetchDocuments]);
+
     const starredCount = useMemo(
-        () => documents.filter((doc) => doc.isStarred).length,
+        () => documents.filter((doc) => doc.starred).length,
         [documents]
     );
 
@@ -99,7 +77,7 @@ const DatabasePage = () => {
         }
 
         if (selectedCategory === 'starred') {
-            filtered = filtered.filter((doc) => doc.isStarred);
+            filtered = filtered.filter((doc) => doc.starred);
         } else if (selectedCategory !== 'all') {
             filtered = filtered.filter((doc) => doc.category === selectedCategory);
         }
@@ -125,14 +103,6 @@ const DatabasePage = () => {
 
     const toggleSidebar = () => {
         setSidebarOpen((previous) => !previous);
-    };
-
-    const handleStarToggle = (docId) => {
-        setDocuments((previousDocs) =>
-            previousDocs.map((doc) =>
-                doc.id === docId ? { ...doc, isStarred: !doc.isStarred } : doc
-            )
-        );
     };
 
     return (
@@ -262,19 +232,22 @@ const DatabasePage = () => {
                                 </thead>
                                 <tbody>
                                     {paginatedDocuments.map((document) => (
-                                        <tr key={document.id}>
+                                        <tr key={document.id} onClick={() => navigate(`/document/${document.id}`)} style={{ cursor: 'pointer' }}>
                                             <td>
                                                 <button
                                                     type="button"
-                                                    className={`database-star-btn ${document.isStarred ? 'starred' : ''}`}
-                                                    onClick={() => handleStarToggle(document.id)}
+                                                    className={`database-star-btn ${document.starred ? 'starred' : ''}`}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        toggleStar(document.id);
+                                                    }}
                                                     aria-label={
-                                                        document.isStarred
+                                                        document.starred
                                                             ? 'Remove from starred'
                                                             : 'Add to starred'
                                                     }
                                                 >
-                                                    <StarIcon size={16} filled={document.isStarred} />
+                                                    <StarIcon size={16} filled={document.starred} />
                                                 </button>
                                             </td>
                                             <td className="database-table-title">{document.title}</td>
@@ -289,20 +262,23 @@ const DatabasePage = () => {
                     ) : (
                         <div className="database-card-grid">
                             {paginatedDocuments.map((document) => (
-                                <article key={document.id} className="database-card">
+                                <article key={document.id} className="database-card" onClick={() => navigate(`/document/${document.id}`)} style={{ cursor: 'pointer' }}>
                                     <div className="database-card-head">
                                         <span>{document.category}</span>
                                         <button
                                             type="button"
-                                            className={`database-star-btn ${document.isStarred ? 'starred' : ''}`}
-                                            onClick={() => handleStarToggle(document.id)}
+                                            className={`database-star-btn ${document.starred ? 'starred' : ''}`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleStar(document.id);
+                                            }}
                                             aria-label={
-                                                document.isStarred
+                                                document.starred
                                                     ? 'Remove from starred'
                                                     : 'Add to starred'
                                             }
                                         >
-                                            <StarIcon size={16} filled={document.isStarred} />
+                                            <StarIcon size={16} filled={document.starred} />
                                         </button>
                                     </div>
                                     <h3>{document.title}</h3>
